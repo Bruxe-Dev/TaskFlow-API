@@ -2,7 +2,7 @@ const { default: mongoose } = require('mongoose');
 
 const projectSchema = new mongoose.Schema({
     name: {
-        title: String,
+        type: String,
         required: [true, 'Project is required'],
         trim: true,
         maxLength: [100, 'Projet name can not exceed 100 Characters'],
