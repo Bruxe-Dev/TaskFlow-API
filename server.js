@@ -16,6 +16,11 @@ mongoose.connect(process.env.MONGO_URI)
         console.error("MongoDB failed to connect successfully", err)
     })
 
+
+const projectRoutes = require('./routes/projectRoute'); //Import Project routes
+app.use('/api/projects', projectRoutes) //Use the routes
+
+
 app.get('/', (req, res) => {
     res.json({ message: "Welcome to the TaskFlow API" })
 })
