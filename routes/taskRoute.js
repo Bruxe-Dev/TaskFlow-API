@@ -140,3 +140,31 @@ router.put('/:id', async (req, res) => {
         })
     }
 })
+
+//To mark a task as copmplete or idncomplete we will use the patch request
+
+router.patch('/:id/complete', async (req, res) => {
+    try {
+        const task = await Task.findById(req.params.id);
+
+        if (!task) {
+            res.status(404).json({
+                success: false,
+                error: "Task Not Found"
+            });
+        }
+        task.completed = !task.completed;
+        await task.save();
+
+        res.status(200).json({
+            success: true,
+            data: task
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: error.message
+        })
+    }
+})
