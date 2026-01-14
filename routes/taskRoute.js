@@ -100,4 +100,43 @@ router.get('/:id', async (req, res) => {
             error: error.message
         });
     }
+});
+
+router.put('/:id', async (req, res) => {
+    try {
+        if (req.body.project) {
+            const projectExists = await Project.findById(req.body.project);
+
+            if (!projectExists) {
+                return res.status(404).json({
+                    success: false,
+                    error: "Project Not found"
+                });
+            }
+        }
+        const task = await Task.findByIdAndUpdate(
+            req.params.id,
+            req.body,
+            {
+                new: true,
+                runValidators: true
+            }
+        ).populate('project', 'name description')
+
+        if (!task) {
+            res.status(404).json({
+                success: false,
+                error: "Task Not Found"
+            })
+        }
+        res.status(200).json({
+            success: true,
+            data: task
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: error.message
+        })
+    }
 })
