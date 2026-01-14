@@ -59,14 +59,45 @@ router.get('/', async (req, res) => {
     }
 });
 
+//Getting multiple tasks by the project id
+
 router.get('/project/:projectId', async (req, res) => {
     try {
         const tasks = await Task.find({
             project: req.params.projectId
         }).populate('project', 'name description')
 
-        res.status(200).json({})
+        res.status(200).json({
+            success: true,
+            count: tasks.length,
+            data: tasks
+        });
     } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: error.message
+        })
+    }
+});
 
+router.get('/:id', async (req, res) => {
+    try {
+        const task = await Task.findById(req.params.id).populate('project', 'name description');
+
+        if (!task) {
+            res.status(404).json({
+                success: false,
+                error: "No Task found"
+            });
+        }
+        res.status(200).json({
+            success: true,
+            data: task
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
     }
 })
