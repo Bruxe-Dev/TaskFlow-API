@@ -167,4 +167,29 @@ router.patch('/:id/complete', async (req, res) => {
             error: error.message
         })
     }
+});
+
+router.delete('/:id', async (req, res) => {
+    try {
+        const task = await Task.findByIdAndDelete(req.params.id);
+
+        if (!task) {
+            res.status(404).json({
+                success: false,
+                error: "Task Not Found"
+            });
+        }
+        res.status(200).json({
+            success: true,
+            data: {},
+            message: "Task Deleted Successfully"
+        })
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: error.message
+        })
+    }
 })
+
+module.exports = router;

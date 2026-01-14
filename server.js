@@ -11,6 +11,9 @@ app.use(express.json());
 const projectRoutes = require('./routes/projectRoute'); //Import Project routes
 app.use('/api/projects', projectRoutes) //Use the routes
 
+const taskRoutes = require('./routes/taskRoute');
+app.use('/api/tasks', taskRoutes)
+
 
 app.get('/', (req, res) => {
     res.json({ message: "Welcome to the TaskFlow API" })
