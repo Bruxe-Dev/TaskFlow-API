@@ -1,6 +1,11 @@
 const { default: mongoose } = require('mongoose');
+const Counter = require('./Counter');
 
 const projectSchema = new mongoose.Schema({
+    projectId: {
+        type: Number,
+        unique: true
+    },
     name: {
         type: String,
         required: [true, 'Project is required'],
@@ -16,6 +21,22 @@ const projectSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     }
-})
+});
+
+//Auto incrementation of Id
+
+projectSchema.pre('save', async () => {
+    if (!this.isNew) return next();
+
+    const counter = await Counter.findByIdAndUpdate(
+        { _id: 'projectId' },
+        { $inc: { seq: 1 } },
+        { new: true, upsert: true },
+    );
+
+    this.projectId = counter.seq;
+    next();
+
+});
 
 module.exports = mongoose.model('Project', projectSchema);
