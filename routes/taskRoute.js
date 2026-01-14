@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router();
 const Task = require('../models/Task');
-const Project = require('../models/Project')
+const Project = require('../models/Project');
 
 router.post('/', async (req, res) => {
     try {
@@ -37,7 +37,7 @@ router.post('/', async (req, res) => {
 
 router.get('/', async (req, res) => {
     try {
-        const tasks = await Project.find().populate('project', 'name description');
+        const tasks = await Task.find().populate('project', 'name description');
 
         if (!tasks) {
             res.status(404).json({
@@ -141,7 +141,7 @@ router.put('/:id', async (req, res) => {
     }
 })
 
-//To mark a task as copmplete or idncomplete we will use the patch request
+//To mark a task as complete or incomplete we will use the patch request
 
 router.patch('/:id/complete', async (req, res) => {
     try {
