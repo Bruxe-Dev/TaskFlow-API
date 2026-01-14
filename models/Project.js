@@ -25,7 +25,7 @@ const projectSchema = new mongoose.Schema({
 
 //Auto incrementation of Id
 
-projectSchema.pre('save', async () => {
+projectSchema.pre('save', async function (next) {
     if (!this.isNew) return next();
 
     const counter = await Counter.findByIdAndUpdate(
@@ -35,8 +35,6 @@ projectSchema.pre('save', async () => {
     );
 
     this.projectId = counter.seq;
-    next();
-
 });
 
 module.exports = mongoose.model('Project', projectSchema);

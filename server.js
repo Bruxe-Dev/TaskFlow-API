@@ -4,7 +4,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const connectDB = require('./config/db')
 
-connectDB();//Connecting to DB
+connectDB(); //Connecting to DB
 
 app.use(express.json());
 
