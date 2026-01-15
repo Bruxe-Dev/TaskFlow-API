@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router();
 const Task = require('../models/Task');
 const Project = require('../models/Project');
+const asyncHandler = require('../middleware/asyncHandlewrapp');
 
 router.post('/', async (req, res) => {
     try {
@@ -190,6 +191,31 @@ router.delete('/:id', async (req, res) => {
             error: error.message
         })
     }
-})
+});
+
+//Get upcomming tasks in a week
+
+router.get('/upcomming/week', asyncHandler(async (req, res) => {
+    const now = new Date();
+    const nextWeek = new Date();
+
+    nextWeek.setDate(nextWeek.getDate() + 7);//Setting the date to one week
+
+    const tasks = await Task.find({
+        dueDate: {
+            $gte: now,
+            $lte: nextWeek
+        },
+        completed: false
+    })
+        .populate('project', 'name description')
+        .sort({ dueDate: 1 });
+
+    res.status(200).json({
+        success: true,
+        count: tasks.length,
+        data: tasks
+    })
+}));
 
 module.exports = router;
