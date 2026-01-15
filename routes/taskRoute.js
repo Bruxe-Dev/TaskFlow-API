@@ -195,7 +195,7 @@ router.delete('/:id', async (req, res) => {
 
 //Get upcomming tasks in a week
 
-router.get('/upcomming/week', asyncHandler(async (req, res) => {
+router.get('/upcoming/week', asyncHandler(async (req, res) => {
     const now = new Date();
     const nextWeek = new Date();
 
@@ -218,7 +218,7 @@ router.get('/upcomming/week', asyncHandler(async (req, res) => {
     })
 }));
 
-// Searching for tasks by title
+// Searching for tasks by title ?
 
 router.get('/search', asyncHandler(async (req, res) => {
     const { q } = req.query
