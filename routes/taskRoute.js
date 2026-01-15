@@ -218,7 +218,9 @@ router.get('/upcomming/week', asyncHandler(async (req, res) => {
     })
 }));
 
-// Seching for tasks by title
+// Searching for tasks by title
 
-
+router.get('/search', asyncHandler(async (req, res) => {
+    const { q } = req.query
+}))
 module.exports = router;
