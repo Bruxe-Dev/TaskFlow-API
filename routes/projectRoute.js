@@ -134,7 +134,7 @@ router.delete('/:id', async (req, res) => {
 //Get a project with all its assigned tasks
 
 router.get('/:id/tasks', asyncHandler(async (req, res) => {
-    const task = require('../models/Task');
+    const Task = require('../models/Task');
     const project = await Project.findById(req.params.id);
 
     if (!project) {
