@@ -222,5 +222,26 @@ router.get('/upcomming/week', asyncHandler(async (req, res) => {
 
 router.get('/search', asyncHandler(async (req, res) => {
     const { q } = req.query
+
+    if (!q) {
+        res.status(400).json({
+            succees: false,
+            error: "No Task Title provided"
+        })
+    }
+    const task = await Task.find({
+        title: {
+            $regex: q,
+            $options: 'i'
+        }
+    })
+        .populate('project', 'name description')
+        .sort({ createdAt: -1 })
+
+    res.status(200).json({
+        succees: true,
+        searchTerm: q,
+        data: task
+    })
 }))
 module.exports = router;
