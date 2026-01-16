@@ -12,4 +12,4 @@ const dbConnect = async () => {
     }
 };
 
-module.exports = dbConnection;
+module.exports = dbConnect;
