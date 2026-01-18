@@ -1,4 +1,4 @@
-# TaskFlow Lite API Reference
+# TaskFlow API Reference
 
 Base URL: `http://localhost:5000/api`
 
@@ -22,8 +22,6 @@ Base URL: `http://localhost:5000/api`
 ### Get Project with Tasks
 **GET** `/projects/:id/tasks`
 
-### Get Project Statistics
-**GET** `/projects/:id/stats`
 
 ### Update Project
 **PUT** `/projects/:id`
