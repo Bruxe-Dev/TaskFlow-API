@@ -49,6 +49,59 @@ router.get('/', async (req, res) => {
     }
 });
 
+// GET project statistics
+router.get('/:id/stats', asyncHandler(async (req, res) => {
+    const Task = require('../models/Task');
+
+    const project = await Project.findById(req.params.id);
+
+    if (!project) {
+        return res.status(404).json({
+            success: false,
+            error: 'Project not found'
+        });
+    }
+
+    const totalTasks = await Task.countDocuments({ project: req.params.id });
+
+    const completedTasks = await Task.countDocuments({
+        project: req.params.id,
+        completed: true
+    });
+
+    const pendingTasks = totalTasks - completedTasks;
+
+    const now = new Date();
+    const overdueTasks = await Task.countDocuments({
+        project: req.params.id,
+        dueDate: { $lt: now },
+        completed: false
+    });
+
+    // Calculate completion percentage
+    const completionPercentage = totalTasks > 0
+        ? Math.round((completedTasks / totalTasks) * 100)
+        : 0;
+
+    res.status(200).json({
+        success: true,
+        data: {
+            project: {
+                _id: project._id,
+                name: project.name,
+                description: project.description
+            },
+            stats: {
+                totalTasks,
+                completedTasks,
+                pendingTasks,
+                overdueTasks,
+                completionPercentage: `${completionPercentage}%`
+            }
+        }
+    });
+}));
+
 //Getting only one project
 
 router.get('/:id', async (req, res) => {
@@ -83,7 +136,7 @@ router.put('/:id', async (req, res) => {
             req.body,
             {
                 new: true, //Returns the updated Document
-                runValidator: true //Makes sure that schema rules are cvalidated
+                runValidators: true //Makes sure that schema rules are cvalidated
             }
         );
         if (!project) {
@@ -112,7 +165,7 @@ router.delete('/:id', async (req, res) => {
         const project = await Project.findByIdAndDelete(req.params.id);
 
         if (!project) {
-            res.status(404).json({
+            return res.status(404).json({
                 success: false,
                 error: 'No Project found'
             })
@@ -126,7 +179,7 @@ router.delete('/:id', async (req, res) => {
     catch (error) {
         res.status(500).json({
             success: false,
-            error: message.error
+            error: error.message
         })
     }
 })
