@@ -22,7 +22,6 @@ Base URL: `http://localhost:5000/api`
 ### Get Project with Tasks
 **GET** `/projects/:id/tasks`
 
-
 ### Update Project
 **PUT** `/projects/:id`
 

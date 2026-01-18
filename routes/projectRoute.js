@@ -93,7 +93,7 @@ router.put('/:id', async (req, res) => {
             })
         }
         res.status(200).json({
-            success: truq,
+            success: true,
             data: project
         })
     }
