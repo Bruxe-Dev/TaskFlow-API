@@ -169,30 +169,6 @@ router.patch('/:id/complete', async (req, res) => {
         })
     }
 });
-
-router.delete('/:id', async (req, res) => {
-    try {
-        const task = await Task.findByIdAndDelete(req.params.id);
-
-        if (!task) {
-            res.status(404).json({
-                success: false,
-                error: "Task Not Found"
-            });
-        }
-        res.status(200).json({
-            success: true,
-            data: {},
-            message: "Task Deleted Successfully"
-        })
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            error: error.message
-        })
-    }
-});
-
 //Get upcomming tasks in a week
 
 router.get('/upcoming/week', asyncHandler(async (req, res) => {
@@ -244,6 +220,48 @@ router.get('/search', asyncHandler(async (req, res) => {
         data: task
     })
 }));
+// GET overdue tasks
+router.get('/overdue/list', asyncHandler(async (req, res) => {
+    // Get current date and time
+    const now = new Date();
+
+    const tasks = await Task.find({
+        dueDate: { $lt: now },
+        completed: false
+    })
+        .populate('project', 'name description')
+        .sort({ dueDate: 1 });  // Sort by due date (oldest first)
+
+    res.status(200).json({
+        success: true,
+        count: tasks.length,
+        data: tasks
+    });
+}));
+
+router.delete('/:id', async (req, res) => {
+    try {
+        const task = await Task.findByIdAndDelete(req.params.id);
+
+        if (!task) {
+            res.status(404).json({
+                success: false,
+                error: "Task Not Found"
+            });
+        }
+        res.status(200).json({
+            success: true,
+            data: {},
+            message: "Task Deleted Successfully"
+        })
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: error.message
+        })
+    }
+});
+
 
 // BULK complete tasks for a project
 router.patch('/project/:projectId/complete-all', asyncHandler(async (req, res) => {
@@ -264,22 +282,4 @@ router.patch('/project/:projectId/complete-all', asyncHandler(async (req, res) =
     });
 }));
 
-// GET overdue tasks
-router.get('/overdue/list', asyncHandler(async (req, res) => {
-    // Get current date and time
-    const now = new Date();
-
-    const tasks = await Task.find({
-        dueDate: { $lt: now },
-        completed: false
-    })
-        .populate('project', 'name description')
-        .sort({ dueDate: 1 });  // Sort by due date (oldest first)
-
-    res.status(200).json({
-        success: true,
-        count: tasks.length,
-        data: tasks
-    });
-}));
 module.exports = router;
