@@ -86,7 +86,7 @@ router.get('/:id', async (req, res) => {
         const task = await Task.findById(req.params.id).populate('project', 'name description');
 
         if (!task) {
-            res.status(404).json({
+            return res.status(404).json({
                 success: false,
                 error: "No Task found"
             });
