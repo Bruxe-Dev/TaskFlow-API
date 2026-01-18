@@ -263,4 +263,23 @@ router.patch('/project/:projectId/complete-all', asyncHandler(async (req, res) =
         modifiedCount: result.modifiedCount
     });
 }));
+
+// GET overdue tasks
+router.get('/overdue/list', asyncHandler(async (req, res) => {
+    // Get current date and time
+    const now = new Date();
+
+    const tasks = await Task.find({
+        dueDate: { $lt: now },
+        completed: false
+    })
+        .populate('project', 'name description')
+        .sort({ dueDate: 1 });  // Sort by due date (oldest first)
+
+    res.status(200).json({
+        success: true,
+        count: tasks.length,
+        data: tasks
+    });
+}));
 module.exports = router;
