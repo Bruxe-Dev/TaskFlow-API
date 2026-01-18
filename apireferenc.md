@@ -52,7 +52,7 @@ Query parameters:
 - `?sortBy=dueDate:asc` - Sort (options: `createdAt`, `dueDate`, `title`)
 
 ### Search Tasks
-**GET** `/tasks/search?q=keyword`
+**GET** `/tasks/search?q=keyword(title)`
 
 ### Get Overdue Tasks
 **GET** `/tasks/overdue/list`

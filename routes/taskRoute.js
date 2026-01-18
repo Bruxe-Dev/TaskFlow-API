@@ -243,5 +243,24 @@ router.get('/search', asyncHandler(async (req, res) => {
         searchTerm: q,
         data: task
     })
-}))
+}));
+
+// BULK complete tasks for a project
+router.patch('/project/:projectId/complete-all', asyncHandler(async (req, res) => {
+    const result = await Task.updateMany(
+        {
+            project: req.params.projectId,
+            completed: false
+        },
+        {
+            completed: true
+        }
+    );
+
+    res.status(200).json({
+        success: true,
+        message: `Marked ${result.modifiedCount} tasks as complete`,
+        modifiedCount: result.modifiedCount
+    });
+}));
 module.exports = router;
