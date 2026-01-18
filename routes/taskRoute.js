@@ -48,7 +48,7 @@ router.get('/', async (req, res) => {
         }
         res.status(200).json({
             success: true,
-            count: tasks.lenght,
+            count: tasks.length,
             data: tasks
         });
 
