@@ -2,6 +2,7 @@ const { default: mongoose } = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
+const { type } = require('os');
 
 const userSchema = new mongoose.Schema({
     username: {
@@ -26,5 +27,15 @@ const userSchema = new mongoose.Schema({
         required: true,
         unique: [true, 'Please provide a password'],
         minLength: [6, 'Password must be at least 6 characters']
+    },
+    isEmailVerified: {
+        type: Boolean,
+        default: false
+    },
+    emailVerificationToken: String,
+    emailVerificationExpire: Date,
+    createdAt: {
+        type: Date,
+        default: Date.now
     }
 })
