@@ -23,6 +23,8 @@ const projectSchema = new mongoose.Schema({
     }
 });
 
+projectSchema.index({ projectId: 1, name: 1 }, { required: true });
+
 //Auto incrementation of Id
 
 projectSchema.pre('save', async function (next) {
