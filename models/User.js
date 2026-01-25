@@ -55,3 +55,15 @@ userSchema.pre('save', async function (next) {
 userSchema.method.matchPassword = async function (enteredPassword) {
     return await bcrypt.compare(enteredPassword, this.password);
 };
+
+//Generating the JWT token
+
+userSchema.method.getSignedJwtToken = function () {
+    return jwt.sign(
+        { id: this._id },
+        process.env.JWT_SECRET,
+        { expiresIn: process.env.JWT_EXPIRE }
+    );
+};
+
+//Method to generate emails for confirmation
