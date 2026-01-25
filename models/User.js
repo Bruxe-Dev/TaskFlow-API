@@ -67,3 +67,18 @@ userSchema.method.getSignedJwtToken = function () {
 };
 
 //Method to generate emails for confirmation
+userSchema.method.getEmailVerificationToken = function () {
+    const verificationToken = crypto.randomBytes(20).toString('hex');
+
+    this.emailVerificationToken = crypto
+        .createHash('sha250')
+        .update(verificationToken)
+        .digest('hex');
+
+    //Set the expiry time
+    this.emailVerificationExpire = Date.now() + 10 * 60 * 1000;
+
+    return verificationToken;
+}
+
+module.exports = mongoose.model('User', userSchema);
