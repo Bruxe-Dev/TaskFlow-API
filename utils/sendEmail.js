@@ -31,4 +31,17 @@ const sendEmail = async (options) => {
 
         return; // Don't send in development
     }
-}
+
+    // Email options
+    const mailOptions = {
+        from: process.env.EMAIL_FROM,
+        to: options.email,
+        subject: options.subject,
+        html: options.message
+    };
+
+    // Send email
+    await transporter.sendMail(mailOptions);
+};
+
+module.exports = sendEmail;
