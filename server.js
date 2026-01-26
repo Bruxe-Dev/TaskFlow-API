@@ -15,11 +15,13 @@ if (process.env.NODE_ENV !== 'production') {
     app.use(logger)
 }
 
+const authRoutes = require('./routes/authRoutes')
 const projectRoutes = require('./routes/projectRoute'); //Import Project routes
-app.use('/api/projects', projectRoutes) //Use the routes
-
 const taskRoutes = require('./routes/taskRoute');
+
+app.use('/api/projects', projectRoutes) //Use the routes
 app.use('/api/tasks', taskRoutes)
+app.use('/api/auth', authRoutes)
 
 
 app.get('/', (req, res) => {
