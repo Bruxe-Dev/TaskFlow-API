@@ -27,4 +27,6 @@ app.use('/api/auth', authRoutes)
 app.get('/', (req, res) => {
     res.json({ message: "Welcome to TaskFlow " })
 })
+
+app.use(errorHandler)
 app.listen(PORT, () => console.log(`App listening on port ${PORT}`))
