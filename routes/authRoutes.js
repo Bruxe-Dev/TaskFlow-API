@@ -8,4 +8,5 @@ const {
     login,
     getMe,
     resendVelification
-} = require('../controllers/authController')
+} = require('../controllers/authController');
+
