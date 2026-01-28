@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const asyncHandler = require('./asyncHandlewrapp');
 const User = require('../models/User');
+require('dotenv').config();
 
 exports.protect = asyncHandler(async (req, res) => {
     let token;
