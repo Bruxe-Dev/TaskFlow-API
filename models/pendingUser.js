@@ -37,3 +37,15 @@ const pendingUserSchema = new mongoose.Schema({
     }
 });
 
+//Generate the verification token
+pendingUserSchema.methods.getEmailVerificationToken = async function () {
+    const verificationToken = crypto.randomBytes(20).toString('hex');
+
+    this.emailVerificationToken = crypto
+        .createHash('sha256')
+        .update(verificationToken)
+        .digest('hex')
+
+    this.emailVerificationExpire = Date.now() + 10 * 60 * 1000;
+    return verificationToken;
+}
