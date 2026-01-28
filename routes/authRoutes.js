@@ -14,11 +14,11 @@ const { protect } = require('../middleware/auth')
 
 //Public Routes
 
-router.post('./register', register);
+router.post('/register', register);
 router.get('/verify-email/:token', verifyEmail)
-router.post('./login', login);
-router.post('./resend-verification', resendVerification)
+router.post('/login', login);
+router.post('/resend-verification', resendVerification)
 
-router.get('./me', protect, getMe)
+router.get('/me', protect, getMe)
 
 module.exports = router;
