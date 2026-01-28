@@ -83,4 +83,9 @@ userSchema.methods.getEmailVerificationToken = function () {
     return verificationToken;
 }
 
+//Method to reset one's password
+userSchema.methods.getResetPasswordToken = function () {
+    const resetToken = crypto.randomBytes(20).toString('hex');
+}
+
 module.exports = mongoose.model('User', userSchema);
