@@ -54,13 +54,13 @@ userSchema.pre('save', async function (next) {
 
 //Comparing passwords
 
-userSchema.method.matchPassword = async function (enteredPassword) {
+userSchema.methods.matchPassword = async function (enteredPassword) {
     return await bcrypt.compare(enteredPassword, this.password);
 };
 
 //Generating the JWT token
 
-userSchema.method.getSignedJwtToken = function () {
+userSchema.methods.getSignedJwtToken = function () {
     return jwt.sign(
         { id: this._id },
         process.env.JWT_SECRET,
@@ -69,7 +69,7 @@ userSchema.method.getSignedJwtToken = function () {
 };
 
 //Method to generate emails for confirmation
-userSchema.method.getEmailVerificationToken = function () {
+userSchema.methods.getEmailVerificationToken = function () {
     const verificationToken = crypto.randomBytes(20).toString('hex');
 
     this.emailVerificationToken = crypto
