@@ -27,7 +27,8 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
         unique: [true, 'Please provide a password'],
-        minLength: [6, 'Password must be at least 6 characters']
+        minLength: [6, 'Password must be at least 6 characters'],
+        select: false
     },
     isEmailVerified: {
         type: Boolean,
