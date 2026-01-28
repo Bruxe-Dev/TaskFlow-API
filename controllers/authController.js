@@ -92,31 +92,36 @@ exports.verifyEmail = asyncHandler(async (req, res) => {
         .update(req.params.token)
         .digest('hex');
 
-    // Find user with this token and check if not expired
-    const user = await User.findOne({
+    // Find pending user with this token and check if not expired
+    const pendingUser = await PendingUser.findOne({
         emailVerificationToken,
         emailVerificationExpire: { $gt: Date.now() }
     });
 
-    if (!user) {
+    if (!pendingUser) {
         return res.status(400).json({
             success: false,
-            error: 'Invalid or expired verification token'
+            error: 'Invalid or expired verification token. Please register again.'
         });
     }
 
-    // Mark email as verified
-    user.isEmailVerified = true;
-    user.emailVerificationToken = undefined;
-    user.emailVerificationExpire = undefined;
-    await user.save();
+    // Create actual user in User collection
+    const user = await User.create({
+        username: pendingUser.username,
+        email: pendingUser.email,
+        password: pendingUser.password, // Already hashed
+        isEmailVerified: true
+    });
+
+    // Delete pending user
+    await pendingUser.deleteOne();
 
     // Generate JWT token for automatic login
     const token = user.getSignedJwtToken();
 
     res.status(200).json({
         success: true,
-        message: 'Email verified successfully! You are now logged in.',
+        message: 'Email verified successfully! Your account has been created and you are now logged in.',
         token,
         data: {
             id: user._id,
