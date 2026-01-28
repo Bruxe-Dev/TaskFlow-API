@@ -47,5 +47,8 @@ pendingUserSchema.methods.getEmailVerificationToken = async function () {
         .digest('hex')
 
     this.emailVerificationExpire = Date.now() + 10 * 60 * 1000;
+
     return verificationToken;
-}
+};
+
+module.exports = mongoose.model('PendingUser', pendingUserSchema);
