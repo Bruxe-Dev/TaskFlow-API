@@ -2,13 +2,12 @@ const { default: mongoose } = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
-const { type } = require('os');
 require('dotenv').config();
 
 const userSchema = new mongoose.Schema({
     username: {
         type: String,
-        required: [true, 'Please provide you username'],
+        required: [true, 'Please provide your username'],
         unique: true,
         trim: true,
         minlength: [3, 'Username must be at least 3 characters'],
@@ -26,16 +25,13 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true,
-        unique: [true, 'Please provide a password'],
         minLength: [6, 'Password must be at least 6 characters'],
         select: false
     },
     isEmailVerified: {
         type: Boolean,
-        default: false
+        default: true // Always true since users only exist after verification
     },
-    emailVerificationToken: String,
-    emailVerificationExpire: Date,
     resetPasswordToken: String,
     resetPasswordExpire: Date,
     createdAt: {
@@ -44,8 +40,7 @@ const userSchema = new mongoose.Schema({
     }
 });
 
-//Hash the passwords before saving
-
+// Hash the passwords before saving (for password updates)
 userSchema.pre('save', async function (next) {
     if (!this.isModified('password')) {
         return next();
@@ -55,14 +50,12 @@ userSchema.pre('save', async function (next) {
     next();
 });
 
-//Comparing passwords
-
+// Comparing passwords
 userSchema.methods.matchPassword = async function (enteredPassword) {
     return await bcrypt.compare(enteredPassword, this.password);
 };
 
-//Generating the JWT token
-
+// Generating the JWT token
 userSchema.methods.getSignedJwtToken = function () {
     return jwt.sign(
         { id: this._id },
@@ -71,22 +64,7 @@ userSchema.methods.getSignedJwtToken = function () {
     );
 };
 
-//Method to generate emails for confirmation
-userSchema.methods.getEmailVerificationToken = function () {
-    const verificationToken = crypto.randomBytes(20).toString('hex');
-
-    this.emailVerificationToken = crypto
-        .createHash('sha256')
-        .update(verificationToken)
-        .digest('hex');
-
-    //Set the expiry time
-    this.emailVerificationExpire = Date.now() + 10 * 60 * 1000;
-
-    return verificationToken;
-}
-
-//Method to reset one's password
+// Method to reset one's password
 userSchema.methods.getResetPasswordToken = function () {
     const resetToken = crypto.randomBytes(20).toString('hex');
 
@@ -97,7 +75,7 @@ userSchema.methods.getResetPasswordToken = function () {
 
     this.resetPasswordExpire = Date.now() + 10 * 60 * 1000;
 
-    return resetToken;//THis woill help return the raw token
+    return resetToken;
 }
 
 module.exports = mongoose.model('User', userSchema);
