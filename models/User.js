@@ -74,7 +74,7 @@ userSchema.methods.getEmailVerificationToken = function () {
     const verificationToken = crypto.randomBytes(20).toString('hex');
 
     this.emailVerificationToken = crypto
-        .createHash('sha250')
+        .createHash('sha256')
         .update(verificationToken)
         .digest('hex');
 
@@ -89,7 +89,7 @@ userSchema.methods.getResetPasswordToken = function () {
     const resetToken = crypto.randomBytes(20).toString('hex');
 
     this.resetPasswordToken = crypto
-        .createHash('sha250')
+        .createHash('sha256')
         .update(resetToken)
         .digest('hex');
 
