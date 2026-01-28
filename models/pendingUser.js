@@ -25,5 +25,15 @@ const pendingUserSchema = new mongoose.Schema({
     emailVerificationToken: {
         type: String,
         required: true
+    },
+    emailVerificationExpire: {
+        type: Date,
+        required: true
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now(),
+        expires: 600
     }
-})
+});
+
