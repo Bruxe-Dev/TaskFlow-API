@@ -33,15 +33,17 @@ exports.register = asyncHandler(async (req, res) => {
     // Delete any existing pending user with this email
     await PendingUser.deleteMany({ email });
 
-    // Create pending user
-    const pendingUser = await PendingUser.create({
+    // Create pending user instance (NOT saved yet)
+    const pendingUser = new PendingUser({
         username,
         email,
         password: hashedPassword
     });
 
-    // Generate verification token
+    // Generate verification token BEFORE saving
     const verificationToken = pendingUser.getEmailVerificationToken();
+
+    // NOW save the pending user
     await pendingUser.save();
 
     // Create verification URL
