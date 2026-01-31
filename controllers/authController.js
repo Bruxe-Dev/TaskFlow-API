@@ -41,7 +41,7 @@ exports.register = asyncHandler(async (req, res) => {
     });
 
     // Generate verification token BEFORE saving
-    const verificationToken = pendingUser.getEmailVerificationToken();
+    const verificationToken = pendingUser.getEmailVerificationToken(); // This is synchronous, no await needed
 
     // NOW save the pending user
     await pendingUser.save();
@@ -77,6 +77,8 @@ exports.register = asyncHandler(async (req, res) => {
     } catch (error) {
         // If email fails, delete the pending user
         await pendingUser.deleteOne();
+
+        console.error('Email send error:', error); // Add this for debugging
 
         return res.status(500).json({
             success: false,
