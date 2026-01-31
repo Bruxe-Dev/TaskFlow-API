@@ -41,7 +41,7 @@ exports.register = asyncHandler(async (req, res) => {
     });
 
     // Generate verification token BEFORE saving
-    const verificationToken = PendingUser.getEmailVerificationToken();
+    const verificationToken = pendingUser.getEmailVerificationToken();
 
     // NOW save the pending user
     await pendingUser.save();
