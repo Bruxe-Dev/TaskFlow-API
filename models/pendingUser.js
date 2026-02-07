@@ -38,7 +38,7 @@ const pendingUserSchema = new mongoose.Schema({
 });
 
 //Generate the verification token
-pendingUserSchema.methods.getEmailVerificationToken = async function () {
+pendingUserSchema.methods.getEmailVerificationToken = function () {
     const verificationToken = crypto.randomBytes(20).toString('hex');
 
     this.emailVerificationToken = crypto
