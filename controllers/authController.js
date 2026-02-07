@@ -34,7 +34,6 @@ exports.register = asyncHandler(async (req, res) => {
     // Delete any existing pending user with this email
     await PendingUser.deleteMany({ email });
 
-    // Create pending user instance (NOT saved yet)
     const pendingUser = new PendingUser({
         username,
         email,
