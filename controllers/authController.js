@@ -53,7 +53,7 @@ exports.register = asyncHandler(async (req, res) => {
     const message = `
     <h1>Welcome to TaskFlow Lite!</h1>
     <p>Thank you for registering. Please verify your email by clicking the link below:</p>
-    <a href="${verificationUrl}" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">Verify Email</a>
+    <a href="${verificationUrl}" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; transition: translateY(-2px)">Verify Email</a>
     <p>Or copy this link: ${verificationUrl}</p>
     <p>This link will expire in 10 minutes.</p>
     <p>If you didn't create an account, please ignore this email.</p>
