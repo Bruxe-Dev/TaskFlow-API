@@ -2,47 +2,38 @@ const nodemailer = require('nodemailer');
 require('dotenv').config();
 
 const sendEmail = async (options) => {
-    let transporter;
-
-    if (process.env.NODE_ENV === 'production') {
-        transporter = nodemailer.createTransport({
-            service: process.env.EMAIL_SERVICE,
+    try {
+        // Create transporter
+        const transporter = nodemailer.createTransport({
+            host: process.env.SMTP_HOST,
+            port: process.env.SMTP_PORT,
+            secure: false, // true for 465, false for other ports
             auth: {
-                user: process.env.EMAIL_USERNAME,
-                pass: process.env.EMAIL_PASSWORD
-            }
-        })
-    } else {
-        // Development: Log to console instead
-        transporter = nodemailer.createTransport({
-            host: 'smtp.ethereal.email',
-            port: 587,
-            auth: {
-                user: 'ethereal.user@ethereal.email',
-                pass: 'ethereal.password'
+                user: process.env.SMTP_USER,
+                pass: process.env.SMTP_PASS
             }
         });
 
-        // For development, we'll just log the email
-        console.log('\n EMAIL WOULD BE SENT:');
-        console.log('To:', options.email);
-        console.log('Subject:', options.subject);
-        console.log('Message:', options.message);
-        console.log('\n');
+        // Email options
+        const mailOptions = {
+            from: process.env.FROM_EMAIL,
+            to: options.email,
+            subject: options.subject,
+            html: options.message
+        };
 
-        return; // Don't send in development
+        // Send email
+        const info = await transporter.sendMail(mailOptions);
+
+        console.log('✅ Email sent successfully!');
+        console.log('Message ID:', info.messageId);
+        console.log('Preview URL:', nodemailer.getTestMessageUrl(info));
+
+        return info;
+    } catch (error) {
+        console.error('❌ Email Error:', error);
+        throw new Error('Email could not be sent');
     }
-
-    // Email options
-    const mailOptions = {
-        from: process.env.EMAIL_FROM,
-        to: options.email,
-        subject: options.subject,
-        html: options.message
-    };
-
-    // Send email
-    await transporter.sendMail(mailOptions);
 };
 
 module.exports = sendEmail;
