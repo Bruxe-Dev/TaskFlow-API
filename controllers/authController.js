@@ -10,7 +10,7 @@ const pendingUser = require('../models/pendingUser');
 exports.register = asyncHandler(async (req, res) => {
     const { username, email, password } = req.body;
 
-    console.log(' CLIENT_URL:', process.env.CLIENT_URL);
+    console.log('CLIENT_URL:', process.env.CLIENT_URL);
     // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
