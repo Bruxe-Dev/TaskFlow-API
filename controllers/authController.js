@@ -41,16 +41,13 @@ exports.register = asyncHandler(async (req, res) => {
         password: hashedPassword
     });
 
-    // Generate verification token BEFORE saving
     const verificationToken = pendingUser.getEmailVerificationToken(); // This is synchronous, no await needed
 
-    // NOW save the pending user
     await pendingUser.save();
 
-    // Create verification URL
     const verificationUrl = `${process.env.CLIENT_URL}/verify-email/${verificationToken}`;
 
-    // Email message
+    console.log(' Verification URL:', verificationUrl);
     const message = `
     <h1>Welcome to TaskFlow Lite!</h1>
     <p>Thank you for registering. Please verify your email by clicking the link below:</p>
