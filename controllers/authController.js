@@ -90,11 +90,15 @@ exports.register = asyncHandler(async (req, res) => {
 // @route   GET /api/auth/verify-email/:token
 // @access  Public
 exports.verifyEmail = asyncHandler(async (req, res) => {
+    console.log(' Verify email called with token:', req.params.token);
+
     // Hash the token from URL
     const emailVerificationToken = crypto
         .createHash('sha256')
         .update(req.params.token)
         .digest('hex');
+
+    console.log(' Hashed token:', emailVerificationToken);
 
     // Find pending user with this token and check if not expired
     const pendingUser = await PendingUser.findOne({
@@ -102,12 +106,16 @@ exports.verifyEmail = asyncHandler(async (req, res) => {
         emailVerificationExpire: { $gt: Date.now() }
     });
 
+    console.log(' Pending user found:', pendingUser ? 'Yes' : 'No');
+
     if (!pendingUser) {
         return res.status(400).json({
             success: false,
             error: 'Invalid or expired verification token. Please register again.'
         });
     }
+
+    console.log(' Creating actual user...');
 
     // Create actual user in User collection
     const user = await User.create({
@@ -117,8 +125,11 @@ exports.verifyEmail = asyncHandler(async (req, res) => {
         isEmailVerified: true
     });
 
+    console.log(' User created:', user._id);
+
     // Delete pending user
     await pendingUser.deleteOne();
+    console.log(' Pending user deleted');
 
     // Generate JWT token for automatic login
     const token = user.getSignedJwtToken();
@@ -232,16 +243,16 @@ exports.resendVerification = asyncHandler(async (req, res) => {
     await user.save();
 
     // Create verification URL
-    const verificationUrl = `${process.env.CLIENT_URL}/verify-email/${verificationToken}`;
+    const verificationUrl = `${process.env.CLIENT_URL} /verify-email/${verificationToken} `;
 
     // Email message
     const message = `
-    <h1>Email Verification</h1>
+    < h1 > Email Verification</h1 >
     <p>Please verify your email by clicking the link below:</p>
     <a href="${verificationUrl}" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">Verify Email</a>
     <p>Or copy this link: ${verificationUrl}</p>
     <p>This link will expire in 10 minutes.</p>
-  `;
+`;
 
     await sendEmail({
         email: user.email,
