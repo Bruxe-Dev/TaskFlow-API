@@ -4,6 +4,7 @@ const asyncHandler = require('../middleware/asyncHandlewrapp');
 const sendEmail = require('../utils/sendEmail');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
+require('dotenv').config();
 
 exports.register = asyncHandler(async (req, res) => {
     const { username, email, password } = req.body;
