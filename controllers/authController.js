@@ -85,9 +85,7 @@ exports.register = asyncHandler(async (req, res) => {
         });
     }
 });
-// @desc    Verify email
-// @route   GET /api/auth/verify-email/:token
-// @access  Public
+
 exports.verifyEmail = asyncHandler(async (req, res) => {
     console.log(' Verify email called with token:', req.params.token);
 
@@ -146,9 +144,7 @@ exports.verifyEmail = asyncHandler(async (req, res) => {
     });
 });
 
-// @desc    Login user
-// @route   POST /api/auth/login
-// @access  Public
+
 exports.login = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
 
@@ -160,7 +156,6 @@ exports.login = asyncHandler(async (req, res) => {
         });
     }
 
-    // Check for user (include password field)
     const user = await User.findOne({ email }).select('+password');
 
     if (!user) {
@@ -203,9 +198,6 @@ exports.login = asyncHandler(async (req, res) => {
     });
 });
 
-// @desc    Get current logged in user
-// @route   GET /api/auth/me
-// @access  Private
 exports.getMe = asyncHandler(async (req, res) => {
     const user = await User.findById(req.user.id);
 
@@ -215,9 +207,7 @@ exports.getMe = asyncHandler(async (req, res) => {
     });
 });
 
-// @desc    Resend verification email
-// @route   POST /api/auth/resend-verification
-// @access  Public
+
 exports.resendVerification = asyncHandler(async (req, res) => {
     const { email } = req.body;
 
@@ -241,7 +231,7 @@ exports.resendVerification = asyncHandler(async (req, res) => {
     const verificationToken = user.getEmailVerificationToken();
     await user.save();
 
-    // Create verification URL
+
     const verificationUrl = `${process.env.CLIENT_URL} /verify-email/${verificationToken} `;
 
     // Email message
