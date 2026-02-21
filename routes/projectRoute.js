@@ -9,6 +9,14 @@ const asyncHandler = require('../middleware/asyncHandlewrapp')
 router.post('/', async (req, res) => {
     try {
         const { name, description } = req.body
+        const exist = await Project.findOne({ name })
+
+        if (exist) {
+            return res.status(400).json({
+                success: false,
+                message: "Project already exists"
+            })
+        }
         const project = new Project({
             name,
             description
