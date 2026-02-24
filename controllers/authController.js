@@ -234,7 +234,7 @@ exports.resendVerification = asyncHandler(async (req, res) => {
 
     // Email message
     const message = `
-    < h1 > Email Verification</h1 >
+    <h1> Email Verification</h1>
     <p>Please verify your email by clicking the link below:</p>
     <a href="${verificationUrl}" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">Verify Email</a>
     <p>Or copy this link: ${verificationUrl}</p>
