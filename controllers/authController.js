@@ -1,4 +1,3 @@
-require('dotenv').config();
 const User = require('../models/User');
 const PendingUser = require('../models/pendingUser');
 const asyncHandler = require('../middleware/asyncHandlewrapp');
