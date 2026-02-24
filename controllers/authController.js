@@ -230,7 +230,7 @@ exports.resendVerification = asyncHandler(async (req, res) => {
     await user.save();
 
 
-    const verificationUrl = `${process.env.CLIENT_URL} /verify-email/${verificationToken} `;
+    const verificationUrl = `${process.env.CLIENT_URL}/verify-email/${verificationToken}`;
 
     // Email message
     const message = `
