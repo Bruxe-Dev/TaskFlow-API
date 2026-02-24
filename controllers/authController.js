@@ -5,7 +5,6 @@ const asyncHandler = require('../middleware/asyncHandlewrapp');
 const sendEmail = require('../utils/sendEmail');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
-const pendingUser = require('../models/pendingUser');
 
 exports.register = asyncHandler(async (req, res) => {
     const { username, email, password } = req.body;
@@ -211,8 +210,7 @@ exports.getMe = asyncHandler(async (req, res) => {
 exports.resendVerification = asyncHandler(async (req, res) => {
     const { email } = req.body;
 
-    const user = await pendingUser.findOne({ email });
-
+    const user = await PendingUser.findOne({ email });
     if (!user) {
         return res.status(404).json({
             success: false,
