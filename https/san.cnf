@@ -1,0 +1,20 @@
+cat > san.cnf << EOF
+[req]
+distinguished_name = req_distinguished_name
+x509_extensions = v3_req
+prompt = no
+[req_distinguished_name]
+C = RW
+ST = Western
+L = Nyabihu
+O = Rwanda Coding Academy
+OU = Web development 
+CN = localhost
+[v3_req]
+keyUsage = keyEncipherment, dataEncipherment
+extendedKeyUsage = serverAuth
+subjectAltName = @alt_names
+[alt_names]
+DNS.1 = localhost
+IP.1 = 127.0.0.1
+EOF
