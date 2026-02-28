@@ -1,5 +1,5 @@
 require('dotenv').config();
-console.log('🔍 Environment Check:');
+console.log('Environment Check:');
 console.log('PORT:', process.env.PORT);
 console.log('CLIENT_URL:', process.env.CLIENT_URL);
 console.log('---');
