@@ -11,7 +11,8 @@ const logger = require('./middleware/reqLogger');
 const errorHandler = require('./middleware/errorHandler');
 
 
-connectDB(); //Connecting to DB
+connectDB();
+
 
 app.use(express.json());
 
