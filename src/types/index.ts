@@ -72,3 +72,20 @@ export enum AccessStatus {
     APPROVED = 'approved',
     DENIED = 'denied'
 }
+
+export interface IOrganisation extends Document {
+    name: string;
+    description?: string;
+    industry?: string;
+    leader: Types.ObjectId;
+    maxAdmins: Number;
+    activeAdmins: Number;
+    fields: Types.ObjectId[];
+    settings: {
+        allowCrossFieldAccess: boolean;
+        requireAccessRequestApproval: boolean;
+        aiEnabled: boolean;
+    };
+    createdAt: Date;
+    updatedAt: Date;
+}
