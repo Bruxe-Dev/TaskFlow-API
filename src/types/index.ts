@@ -89,3 +89,29 @@ export interface IOrganisation extends Document {
     createdAt: Date;
     updatedAt: Date;
 }
+
+export interface IUser extends Document {
+    username: string;
+    email: string;
+    password: string;
+    role: UserRole;
+    organisation: Types.ObjectId;
+    field: Types.ObjectId;
+    teams: Types.ObjectId[];
+    permissions: {
+        canCreateTeams: boolean;
+        canAssignTeams: boolean;
+        canReviewSubmissions: boolean;
+    };
+    isEmailVerified: boolean;
+    emailVerificationToken?: string;
+    emailVerificationExpire?: Date;
+    profilePicture: string;
+    createdAt: Date;
+    lastActive: Date;
+
+    //Checking Methods
+    matchPassword(enteredPassword: string): Promise<boolean>;
+    getSignedJwtToken(): string;
+    getEmailVerificationToken(): string;
+}
