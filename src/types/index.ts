@@ -115,3 +115,15 @@ export interface IUser extends Document {
     getSignedJwtToken(): string;
     getEmailVerificationToken(): string;
 }
+
+export interface IField extends Document {
+    name: string;
+    description?: string;
+    organization: Types.ObjectId;
+    admin: Types.ObjectId;
+    teams: Types.ObjectId[];
+    sharedWithAdmins: Types.ObjectId[];
+    color?: string;
+    icon?: string;
+    createdAt: Date;
+}
