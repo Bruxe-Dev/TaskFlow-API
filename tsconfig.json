@@ -20,7 +20,8 @@
         ]
     },
     "include": [
-        "src/**/*"
+        "src/**/*",
+        "src/server.js"
     ],
     "exclude": [
         "node_modules",

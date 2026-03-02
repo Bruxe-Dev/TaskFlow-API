@@ -1,7 +1,7 @@
 const User = require('../models/User');
 const PendingUser = require('../models/pendingUser');
 const asyncHandler = require('../middleware/asyncHandlewrapp');
-const sendEmail = require('../../utils/sendEmail');
+const sendEmail = require('../utils/sendEmail');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 
