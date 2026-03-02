@@ -1,12 +1,12 @@
 import { Document, Types } from 'mongoose';
 
-export enum userRole {
+export enum UserRole {
     ORG_LEADER = 'org_leader',
     FIELD_ADMIN = 'field_admin',
     MEMBER = 'member'
 }
 
-export enum projectStatus {
+export enum ProjectStatus {
     PENDING = 'pending',
     IN_PROGRESS = 'in_progress',
     REVIEW = 'review',
@@ -14,13 +14,13 @@ export enum projectStatus {
     OVERDUE = 'overdue'
 }
 
-export enum taskStatus {
+export enum TaskStatus {
     TODO = 'todo',
     IN_PROGRESS = 'in_progress',
     COMPLETED = 'completed'
 }
 
-export enum priority {
+export enum Priority {
     LOW = 'low',
     medium = 'medium',
     HIGH = 'high',
@@ -33,4 +33,42 @@ export enum SubmissionStatus {
     APPROVED = 'approved',
     REJECTED = 'rejected',
     REVISION_REQUESTED = 'revision-requested'
+}
+
+export enum NotificationType {
+    TASK_ASSIGNED = 'task_assigned',
+    DEADLINE_REMINDER = 'deadline_reminder',
+    PROJECT_UPDATE = 'project_update',
+    SUBMISSION_REVIEWED = 'submission_reviewed',
+    ANNOUNCEMENT = 'announcement',
+    ACCESS_GRANTED = 'access_granted',
+    ACCESS_DENIED = 'access_denied'
+}
+
+export enum ProblemCategory {
+    TECHNICAL = 'technical',
+    RESOURCE = 'resource',
+    COLLABORATION = 'collaboration',
+    TIMELINE = 'timeline',
+    OTHER = 'other'
+}
+
+export enum ProblemSeverity {
+    LOW = 'low',
+    MEDIUM = 'medium',
+    HIGH = 'high',
+    URGENT = 'urgent'
+}
+
+export enum ProblemStatus {
+    OPEN = 'open',
+    IN_PROGRESS = 'in_progress',
+    RESOLVED = 'resolved',
+    CLOSED = 'closed'
+}
+
+export enum AccessStatus {
+    PENDING = 'pending',
+    APPROVED = 'approved',
+    DENIED = 'denied'
 }
