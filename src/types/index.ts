@@ -13,3 +13,24 @@ export enum projectStatus {
     COMPLETED = 'completed',
     OVERDUE = 'overdue'
 }
+
+export enum taskStatus {
+    TODO = 'todo',
+    IN_PROGRESS = 'in_progress',
+    COMPLETED = 'completed'
+}
+
+export enum priority {
+    LOW = 'low',
+    medium = 'medium',
+    HIGH = 'high',
+    URGENT = 'urgent'
+}
+
+export enum SubmissionStatus {
+    PENDING = 'pending',
+    UNDER_REVIEW = 'under-review',
+    APPROVED = 'approved',
+    REJECTED = 'rejected',
+    REVISION_REQUESTED = 'revision-requested'
+}
