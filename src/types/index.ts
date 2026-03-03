@@ -252,3 +252,32 @@ export interface IProblemReport extends Document {
     createdAt: Date;
     resolvedAt?: Date;
 }
+
+export interface IAccessRequest extends Document {
+    requester: Types.ObjectId;
+    targetField: Types.ObjectId;
+    targetWorkspace?: Types.ObjectId;
+    reason: string;
+    status: AccessStatus;
+    approvedBy?: Types.ObjectId;
+    approvalNotes?: string;
+    expiresAt?: Date;
+    createdAt: Date;
+    processedAt?: Date;
+}
+
+export interface IAIConversation extends Document {
+    workspace: Types.ObjectId;
+    user: Types.ObjectId;
+    messages: {
+        role: 'user' | 'assistant';
+        content: string;
+        timestamp: Date;
+    }[];
+    context?: {
+        project?: Types.ObjectId;
+        task?: Types.ObjectId;
+    };
+    createdAt: Date;
+    lastMessageAt: Date;
+}
