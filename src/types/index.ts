@@ -235,3 +235,20 @@ export interface INotifications extends Document {
     priority: Priority;
     createdAt: Date;
 }
+
+export interface IProblemReport extends Document {
+    reportedBy: Types.ObjectId;
+    team: Types.ObjectId;
+    category: ProblemCategory;
+    title: string;
+    description: string;
+    severity: ProblemSeverity;
+    status: ProblemStatus;
+    assignedTo?: Types.ObjectId;
+    resolution?: string;
+    attachments: {
+        url: string
+    }[];
+    createdAt: Date;
+    resolvedAt?: Date;
+}
