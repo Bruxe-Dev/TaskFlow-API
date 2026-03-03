@@ -189,3 +189,20 @@ export interface ITask extends Document {
     createdAt: Date;
     completedAt: Date;
 }
+
+export interface IUpdate extends Document {
+    workspace: Types.ObjectId;
+    user: Types.ObjectId;
+    type: 'progress' | 'comment' | 'milestone' | 'blocker';
+    content: string;
+    relatedTo?: {
+        type: 'project' | 'task';
+        id: Types.ObjectId;
+    };
+    mentions: Types.ObjectId[];
+    attachments: {
+        url: string;
+        name: string;
+    }[];
+    createdAt: Date;
+}
