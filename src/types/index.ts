@@ -127,3 +127,17 @@ export interface IField extends Document {
     icon?: string;
     createdAt: Date;
 }
+
+export interface ITeam extends Document {
+    name: string;
+    description?: string;
+    field: Types.ObjectId;
+    organisation: Types.ObjectId;
+    members: {
+        user: Types.ObjectId;
+        role: 'leader' | 'member';
+        joinedAt: Date
+    }[];
+    workspace: Types.ObjectId;
+    createdAt: Date;
+}
