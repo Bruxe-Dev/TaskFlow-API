@@ -155,3 +155,18 @@ export interface IWorkspace extends Document {
     };
     createdAt: Date;
 }
+
+export interface Iproject extends Document {
+    name: string;
+    description: string;
+    workspace: Types.ObjectId;
+    team: Types.ObjectId;
+    assignedBy: Types.ObjectId;
+    status: ProjectStatus;
+    priority: Priority;
+    tasks: Types.ObjectId[];
+    submissions: Types.ObjectId[];
+    progress: number;
+    createdAt: Date;
+    updatedAt: Date;
+}
