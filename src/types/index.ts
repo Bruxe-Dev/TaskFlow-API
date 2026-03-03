@@ -281,3 +281,7 @@ export interface IAIConversation extends Document {
     createdAt: Date;
     lastMessageAt: Date;
 }
+
+export interface AuthRequest extends Request {
+    user?: IUser;
+}
