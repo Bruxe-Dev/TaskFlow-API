@@ -170,3 +170,22 @@ export interface Iproject extends Document {
     createdAt: Date;
     updatedAt: Date;
 }
+
+export interface ITask extends Document {
+    name: string;
+    desription?: string;
+    task: Types.ObjectId;
+    assignedTo: Types.ObjectId[];
+    assignedBy: Types.ObjectId;
+    status: TaskStatus;
+    priority: Priority;
+    dueDate: Date;
+    dependancies: Types.ObjectId[];
+    attachments: {
+        name: string;
+        url: string;
+        uploadedAt: Date;
+    }[];
+    createdAt: Date;
+    completedAt: Date;
+}
