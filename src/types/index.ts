@@ -206,3 +206,20 @@ export interface IUpdate extends Document {
     }[];
     createdAt: Date;
 }
+
+export interface ISubmission extends Document {
+    project: Types.ObjectId;
+    submittedBy: Types.ObjectId;
+    team: Types.ObjectId;
+    content: string;
+    files?: {
+        name: string;
+        url: string;
+        size: Number;
+    }[];
+    status: SubmissionStatus;
+    reviewedBy?: Types.ObjectId;
+    reviewNotes?: string;
+    reviewedAt?: Date;
+    submittedAt: Date;
+}
