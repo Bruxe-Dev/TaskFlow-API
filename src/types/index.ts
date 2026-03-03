@@ -223,3 +223,15 @@ export interface ISubmission extends Document {
     reviewedAt?: Date;
     submittedAt: Date;
 }
+
+export interface INotifications extends Document {
+    sender: Types.ObjectId;
+    reciever: Types.ObjectId;
+    type: NotificationType;
+    title: string;
+    message: string;
+    link?: string;
+    read: boolean;
+    priority: Priority;
+    createdAt: Date;
+}
