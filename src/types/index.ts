@@ -141,3 +141,17 @@ export interface ITeam extends Document {
     workspace: Types.ObjectId;
     createdAt: Date;
 }
+
+export interface IWorkspace extends Document {
+    team: Types.ObjectId;
+    name: string;
+    description?: string;
+    project: Types.ObjectId[];
+    aiAssistantEnabled: boolean;
+    aiConverstaions: Types.ObjectId[];
+    settings: {
+        allowFileSharing: boolean;
+        notifyOnUpdates: boolean;
+    };
+    createdAt: Date;
+}
