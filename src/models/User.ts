@@ -1,5 +1,6 @@
 import {
-    Model, Schema
+    Model, Schema,
+    Types
 } from "mongoose";
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
@@ -30,5 +31,51 @@ const userSchema = new Schema<IUser>({
         unique: true,
         select: false,
         minLength: [6, 'Password must be 6 chars minimum']
+    },
+    role: {
+        type: String,
+        enum: Object.values(UserRole),
+        default: UserRole.MEMBER
+    },
+    organization: {
+        type: Schema.Types.ObjectId,
+        ref: 'Organization'
+    },
+    field: {
+        type: Schema.Types.ObjectId,
+        ref: 'Field'
+    },
+    teams: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Team'
+    }],
+    permissions: {
+        canCreateTeams: {
+            type: Boolean,
+            default: false
+        },
+        canAssignTasks: {
+            type: Boolean,
+            default: false
+        },
+        canReviewSubmissions: {
+            type: Boolean,
+            default: false
+        }
+    },
+    isEmailVerified: {
+        type: Boolean,
+        default: false
+    },
+    emailVerificationToken: String,
+    emailVerificationExpire: Date,
+    profilePicture: String,
+    createdAt: {
+        type: Date,
+        default: Date.now
+    },
+    lastActive: {
+        type: Date,
+        default: Date.now
     }
 })

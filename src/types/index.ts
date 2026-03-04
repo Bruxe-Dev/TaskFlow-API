@@ -95,7 +95,7 @@ export interface IUser extends Document {
     email: string;
     password: string;
     role: UserRole;
-    organisation: Types.ObjectId;
+    organization: Types.ObjectId;
     field: Types.ObjectId;
     teams: Types.ObjectId[];
     permissions: {
