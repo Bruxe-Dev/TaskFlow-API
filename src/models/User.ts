@@ -1,6 +1,6 @@
 import mongoose, { Schema, Model } from 'mongoose';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import jwt, { SignOptions } from 'jsonwebtoken';
 import crypto from 'crypto';
 import { IUser, UserRole } from '../types';
 
@@ -93,11 +93,23 @@ userSchema.methods.matchPassword = async function (enteredPassword: string): Pro
     return await bcrypt.compare(enteredPassword, this.password);
 };
 
+
 userSchema.methods.getSignedJwtToken = function (): string {
+    const secret = process.env.JWT_SECRET;
+    const expire = '30d';
+
+    if (!secret) {
+        throw new Error('JWT_SECRET is required');
+    }
+
+    const options: SignOptions = {
+        expiresIn: expire
+    };
+
     return jwt.sign(
-        { id: this._id },
-        process.env.JWT_SECRET as string,
-        { expiresIn: process.env.JWT_EXPIRE }
+        { id: this._id.toString() },
+        secret,
+        options
     );
 };
 
