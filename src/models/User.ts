@@ -1,5 +1,4 @@
 import mongoose, { Schema, Model } from 'mongoose';
-import { NextFunction } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
