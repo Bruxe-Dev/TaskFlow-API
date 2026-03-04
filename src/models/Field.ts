@@ -1,4 +1,4 @@
-import { Model, Schema, Types } from 'mongoose'
+import mongoose, { Model, Schema, Types } from 'mongoose'
 import { IField } from '../types'
 import { settings } from 'node:cluster'
 
@@ -24,5 +24,29 @@ const fieldSchema = new Schema<IField>({
         ref: 'User',
         required: true,
         trim: true
+    },
+    teams: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Team',
+        required: true
+    }], sharedWithAdmins: [{
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    }],
+    color: {
+        type: String,
+        default: '#3B82F6' // Default blue
+    },
+    icon: {
+        type: String,
+        default: 'folder'
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
     }
 })
+
+const Field: Model<IField> = mongoose.model<IField>('Field', fieldSchema);
+
+export default Field;
