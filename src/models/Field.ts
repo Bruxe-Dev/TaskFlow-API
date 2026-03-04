@@ -35,7 +35,7 @@ const fieldSchema = new Schema<IField>({
     }],
     color: {
         type: String,
-        default: '#3B82F6' // Default blue
+        default: '#3B82F6'
     },
     icon: {
         type: String,

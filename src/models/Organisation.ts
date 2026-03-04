@@ -62,9 +62,8 @@ const orgnaisationSchema = new Schema<IOrganisation>({
     }
 })
 
-orgnaisationSchema.pre('save', async function (next) {
+orgnaisationSchema.pre('save', async function () {
     this.updatedAt = new Date();
-    next();
 })
 
 const Organisation: Model<IOrganisation> = mongoose.model<IOrganisation>('Organisation', orgnaisationSchema)
