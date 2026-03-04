@@ -1,36 +1,34 @@
-import {
-    Model, Schema,
-    Types
-} from "mongoose";
-import bcrypt from 'bcryptjs'
-import jwt from 'jsonwebtoken'
-import crypto from 'crypto'
-import { IUser, UserRole } from '../types/index'
+import mongoose, { Schema, Model } from 'mongoose';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
+import { IUser, UserRole } from '../types';
 
 const userSchema = new Schema<IUser>({
     username: {
         type: String,
-        required: [true, 'Please enter a username'],
-        trim: true,
+        required: [true, 'Please provide a username'],
         unique: true,
-        minLength: [4, 'Username must ne 6 Chars min'],
-        maxLength: [8, 'Username must not overceed 8Chars']
+        trim: true,
+        minlength: [3, 'Username must be at least 3 characters'],
+        maxlength: [30, 'Username cannot exceed 30 characters']
     },
     email: {
         type: String,
-        required: [true, 'Please enter you email'],
-        trim: true,
-        match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
-            'Please provide a valid email'],
+        required: [true, 'Please provide an email'],
         unique: true,
         lowercase: true,
+        trim: true,
+        match: [
+            /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
+            'Please provide a valid email'
+        ]
     },
     password: {
         type: String,
-        required: [true, 'Please a password'],
-        unique: true,
-        select: false,
-        minLength: [6, 'Password must be 6 chars minimum']
+        required: [true, 'Please provide a password'],
+        minlength: [6, 'Password must be at least 6 characters'],
+        select: false
     },
     role: {
         type: String,
@@ -78,4 +76,45 @@ const userSchema = new Schema<IUser>({
         type: Date,
         default: Date.now
     }
-})
+});
+
+// Hash password before saving
+userSchema.pre('save', async function (next) {
+    if (!this.isModified('password')) {
+        next();
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+});
+
+// Method to compare passwords
+userSchema.methods.matchPassword = async function (enteredPassword: string): Promise<boolean> {
+    return await bcrypt.compare(enteredPassword, this.password);
+};
+
+userSchema.methods.getSignedJwtToken = function (): string {
+    return jwt.sign(
+        { id: this._id },
+        process.env.JWT_SECRET as string,
+        { expiresIn: process.env.JWT_EXPIRE }
+    );
+};
+
+// Method to generate email verification token
+userSchema.methods.getEmailVerificationToken = function (): string {
+    const verificationToken = crypto.randomBytes(20).toString('hex');
+
+    this.emailVerificationToken = crypto
+        .createHash('sha256')
+        .update(verificationToken)
+        .digest('hex');
+
+    this.emailVerificationExpire = new Date(Date.now() + 10 * 60 * 1000);
+
+    return verificationToken;
+};
+
+const User: Model<IUser> = mongoose.model<IUser>('User', userSchema);
+
+export default User;
