@@ -188,7 +188,7 @@ export interface ITask extends Document {
         uploadedAt: Date;
     }[];
     createdAt: Date;
-    completedAt: Date;
+    completedAt: Date | undefined;
 }
 
 export interface IUpdate extends Document {
