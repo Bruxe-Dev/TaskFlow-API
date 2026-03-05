@@ -25,8 +25,8 @@ const accessRequestSchema = new Schema<IAccessRequest>({
     },
     status: {
         type: String,
-        enum: Object.values(AccessRequestStatus),
-        default: AccessRequestStatus.PENDING
+        enum: Object.values(AccessStatus),
+        default: AccessStatus.PENDING
     },
     approvedBy: {
         type: Schema.Types.ObjectId,
@@ -51,7 +51,7 @@ const accessRequestSchema = new Schema<IAccessRequest>({
 
 // Set processedAt when status changes from pending
 accessRequestSchema.pre('save', function () {
-    if (this.isModified('status') && this.status !== AccessRequestStatus.PENDING && !this.processedAt) {
+    if (this.isModified('status') && this.status !== AccessStatus.PENDING && !this.processedAt) {
         this.processedAt = new Date();
     }
 });
