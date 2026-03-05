@@ -146,9 +146,9 @@ export interface IWorkspace extends Document {
     team: Types.ObjectId;
     name: string;
     description?: string;
-    project: Types.ObjectId[];
+    projects: Types.ObjectId[];
     aiAssistantEnabled: boolean;
-    aiConverstaions: Types.ObjectId[];
+    aiConversations: Types.ObjectId[];
     settings: {
         allowFileSharing: boolean;
         notifyOnUpdates: boolean;
