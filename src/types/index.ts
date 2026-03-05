@@ -175,13 +175,13 @@ export interface IProject extends Document {
 export interface ITask extends Document {
     name: string;
     description?: string;
-    task: Types.ObjectId;
+    project: Types.ObjectId;
     assignedTo: Types.ObjectId[];
     assignedBy: Types.ObjectId;
     status: TaskStatus;
     priority: Priority;
     dueDate: Date;
-    dependancies: Types.ObjectId[];
+    dependencies: Types.ObjectId[];
     attachments: {
         name: string;
         url: string;
