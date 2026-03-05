@@ -8,6 +8,6 @@ export { default as Task } from './Task';
 export { default as Update } from './Update';
 export { default as Submission } from './Submission';
 export { default as Notification } from './Notification';
-export { default as ProblemReport } from './ProblemReport';
+export { default as ProblemReport } from './problemReport';
 export { default as AccessRequest } from './AccessRequest';
 export { default as AIConversation } from './AiConversation';
