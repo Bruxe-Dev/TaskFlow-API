@@ -1,8 +1,8 @@
 import mongoose, { Schema, Model } from 'mongoose';
-import { INotification, NotificationType, Priority } from '../types';
+import { INotifications, NotificationType, Priority } from '../types';
 
-const notificationSchema = new Schema<INotification>({
-    recipient: {
+const notificationSchema = new Schema<INotifications>({
+    reciever: {
         type: Schema.Types.ObjectId,
         ref: 'User',
         required: true
@@ -50,6 +50,6 @@ const notificationSchema = new Schema<INotification>({
 // Index for efficient querying
 notificationSchema.index({ recipient: 1, read: 1, createdAt: -1 });
 
-const Notification: Model<INotification> = mongoose.model<INotification>('Notification', notificationSchema);
+const Notification: Model<INotifications> = mongoose.model<INotifications>('Notification', notificationSchema);
 
 export default Notification;
