@@ -156,7 +156,7 @@ export interface IWorkspace extends Document {
     createdAt: Date;
 }
 
-export interface Iproject extends Document {
+export interface IProject extends Document {
     name: string;
     description: string;
     workspace: Types.ObjectId;
