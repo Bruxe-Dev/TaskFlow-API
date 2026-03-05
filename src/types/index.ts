@@ -164,6 +164,7 @@ export interface IProject extends Document {
     assignedBy: Types.ObjectId;
     status: ProjectStatus;
     priority: Priority;
+    deadline: Date;
     tasks: Types.ObjectId[];
     submissions: Types.ObjectId[];
     progress: number;
