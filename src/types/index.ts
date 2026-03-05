@@ -174,7 +174,7 @@ export interface IProject extends Document {
 
 export interface ITask extends Document {
     name: string;
-    desription?: string;
+    description?: string;
     task: Types.ObjectId;
     assignedTo: Types.ObjectId[];
     assignedBy: Types.ObjectId;

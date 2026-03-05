@@ -2,7 +2,7 @@ import mongoose, { Schema, Model } from 'mongoose';
 import { ITask, TaskStatus, Priority } from '../types';
 
 const taskSchema = new Schema<ITask>({
-    title: {
+    name: {
         type: String,
         required: [true, 'Task title is required'],
         trim: true,
