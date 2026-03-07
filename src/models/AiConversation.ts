@@ -56,4 +56,4 @@ aiConversationSchema.pre('save', function () {
 
 const AIConversation: Model<IAIConversation> = mongoose.model<IAIConversation>('AIConversation', aiConversationSchema);
 
-export default AIConversation;
+export default AIConversation; 
