@@ -89,6 +89,15 @@ export interface IOrganisation extends Document {
     createdAt: Date;
     updatedAt: Date;
 }
+export interface IPendingUser extends Document {
+    username: string;
+    email: string;
+    password: string;
+    emailVerificationToken: string;
+    emailVerificationExpire: Date;
+    createdAt: Date;
+    getEmailVerificationToken(): string;
+}
 
 export interface IUser extends Document {
     username: string;
