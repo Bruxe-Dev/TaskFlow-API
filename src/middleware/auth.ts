@@ -17,7 +17,7 @@ declare global {
     }
 }
 
-exports.protect = asyncHandleWrapper(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+const protect = asyncHandleWrapper(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     let token: string | undefined;
 
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
@@ -66,3 +66,5 @@ exports.protect = asyncHandleWrapper(async (req: Request, res: Response, next: N
         })
     }
 })
+
+export default protect

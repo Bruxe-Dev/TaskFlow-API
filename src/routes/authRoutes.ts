@@ -9,8 +9,8 @@ import {
     resendVerification
 } from '../controllers/authController';
 
-import { protect } from '../middleware/auth'
-
+import protect from '../middleware/auth'
+const router: Router = express.Router()
 //Public Routes
 
 router.post('/register', register);
