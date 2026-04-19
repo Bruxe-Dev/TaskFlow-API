@@ -8,11 +8,11 @@ console.log('---');
 
 import express, { Application, Request, Response } from 'express';
 import dbConnect from './config/db';
-import logger from './middleware/reqLogger';
+import requestLogger from './middleware/reqLogger'
 import errorHandler from './middleware/errorHandler';
-import authRoutes from './routes/authRoutes';
-import projectRoutes from './routes/projectRoute';
-import taskRoutes from './routes/taskRoute';
+import authRoutes from './routes/authRoutes'
+import projectRoutes from './routes/projectRoute'
+import taskRoutes from './routes/taskRoute'
 
 const app: Application = express();
 const PORT: number = parseInt(process.env.PORT || '5000', 10);
@@ -24,7 +24,7 @@ dbConnect();
 app.use(express.json());
 
 if (process.env.NODE_ENV !== 'production') {
-    app.use(logger);
+    app.use(requestLogger);
 }
 
 // Routes

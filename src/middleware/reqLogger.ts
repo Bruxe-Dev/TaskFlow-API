@@ -5,4 +5,4 @@ const requestLogger = (req: Request, res: Response, next: NextFunction): void =>
     next();
 };
 
-module.exports = requestLogger;
+export default requestLogger
