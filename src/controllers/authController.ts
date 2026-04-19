@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import crypto from 'crypto';
 import bcrypt from 'bcrypt';
 import User from '../models/User';
-import PendingUser from '../models/pendingUser';
+import PendingUser from '../models/PendingUser';
 import sendEmail from '../utils/sendEmail';
 import asyncHandleWrapper from '../middleware/asyncHandlewrapp';
 
