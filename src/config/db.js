@@ -1,6 +1,5 @@
-const express = require('express');
-const { default: mongoose } = require('mongoose');
-require('dotenv').config();
+import express from 'express'
+import mongoose from 'mongoose'
 
 const dbConnect = async () => {
     try {
