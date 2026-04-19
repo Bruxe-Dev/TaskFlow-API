@@ -1,33 +1,39 @@
-import User from '../models/User'
-import pendingUser from '../models/pendingUser'
-import asyncHandleWrapper from '../middleware/asyncHandlewrapp';
+import { Request, Response, NextFunction } from 'express';
+import crypto from 'crypto';
+import bcrypt from 'bcrypt';
+import User from '../models/User';
+import PendingUser from '../models/pendingUser';
+import asyncHandlerWrapper from '../middleware/asyncHandlerWrapper';
 import sendEmail from '../utils/sendEmail';
-import crypto from 'crypto'
-import bcrypt from 'bcrypt'
 
-exports.register = asyncHandler(async (req, res) => {
+// ─── Register ───────────────────────────────────────────────────────────────
+
+export const register = asyncHandlerWrapper(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { username, email, password } = req.body;
 
     console.log('CLIENT_URL:', process.env.CLIENT_URL);
+
     // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-        return res.status(400).json({
+        res.status(400).json({
             success: false,
             error: 'User with this email already exists'
         });
+        return;
     }
 
     // Check if username is taken
     const existingUsername = await User.findOne({ username });
     if (existingUsername) {
-        return res.status(400).json({
+        res.status(400).json({
             success: false,
             error: 'Username is already taken'
         });
+        return;
     }
 
-    // Hash password manually before storing in PendingUser
+    // Hash password before storing in PendingUser
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
@@ -40,21 +46,20 @@ exports.register = asyncHandler(async (req, res) => {
         password: hashedPassword
     });
 
-    const verificationToken = pendingUser.getEmailVerificationToken(); // This is synchronous, no await needed
-
+    const verificationToken = pendingUser.getEmailVerificationToken();
     await pendingUser.save();
 
     const verificationUrl = `${process.env.CLIENT_URL}/verify-email/${verificationToken}`;
+    console.log('Verification URL:', verificationUrl);
 
-    console.log(' Verification URL:', verificationUrl);
     const message = `
-    <h1>Welcome to TaskFlow Lite!</h1>
-    <p>Thank you for registering. Please verify your email by clicking the link below:</p>
-    <a href="${verificationUrl}" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; transition: translateY(-2px)">Verify Email</a>
-    <p>Or copy this link: ${verificationUrl}</p>
-    <p>This link will expire in 10 minutes.</p>
-    <p>If you didn't create an account, please ignore this email.</p>
-  `;
+        <h1>Welcome to TaskFlow Lite!</h1>
+        <p>Thank you for registering. Please verify your email by clicking the link below:</p>
+        <a href="${verificationUrl}" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">Verify Email</a>
+        <p>Or copy this link: ${verificationUrl}</p>
+        <p>This link will expire in 10 minutes.</p>
+        <p>If you didn't create an account, please ignore this email.</p>
+    `;
 
     try {
         await sendEmail({
@@ -72,61 +77,57 @@ exports.register = asyncHandler(async (req, res) => {
             }
         });
     } catch (error) {
-        // If email fails, delete the pending user
         await pendingUser.deleteOne();
+        console.error('Email send error:', error);
 
-        console.error('Email send error:', error); // Add this for debugging
-
-        return res.status(500).json({
+        res.status(500).json({
             success: false,
             error: 'Email could not be sent. Please try again.'
         });
     }
 });
 
-exports.verifyEmail = asyncHandler(async (req, res) => {
-    console.log(' Verify email called with token:', req.params.token);
+// ─── Verify Email ────────────────────────────────────────────────────────────
 
-    // Hash the token from URL
+export const verifyEmail = asyncHandlerWrapper(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    console.log('Verify email called with token:', req.params.token);
+
     const emailVerificationToken = crypto
         .createHash('sha256')
         .update(req.params.token)
         .digest('hex');
 
-    console.log(' Hashed token:', emailVerificationToken);
+    console.log('Hashed token:', emailVerificationToken);
 
-    // Find pending user with this token and check if not expired
     const pendingUser = await PendingUser.findOne({
         emailVerificationToken,
         emailVerificationExpire: { $gt: Date.now() }
     });
 
-    console.log(' Pending user found:', pendingUser ? 'Yes' : 'No');
+    console.log('Pending user found:', pendingUser ? 'Yes' : 'No');
 
     if (!pendingUser) {
-        return res.status(400).json({
+        res.status(400).json({
             success: false,
             error: 'Invalid or expired verification token. Please register again.'
         });
+        return;
     }
 
-    console.log(' Creating actual user...');
+    console.log('Creating actual user...');
 
-    // Create actual user in User collection
     const user = await User.create({
         username: pendingUser.username,
         email: pendingUser.email,
-        password: pendingUser.password, // Already hashed
+        password: pendingUser.password,
         isEmailVerified: true
     });
 
-    console.log(' User created:', user._id);
+    console.log('User created:', user._id);
 
-    // Delete pending user
     await pendingUser.deleteOne();
-    console.log(' Pending user deleted');
+    console.log('Pending user deleted');
 
-    // Generate JWT token for automatic login
     const token = user.getSignedJwtToken();
 
     res.status(200).json({
@@ -142,46 +143,47 @@ exports.verifyEmail = asyncHandler(async (req, res) => {
     });
 });
 
+// ─── Login ───────────────────────────────────────────────────────────────────
 
-exports.login = asyncHandler(async (req, res) => {
+export const login = asyncHandlerWrapper(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { email, password } = req.body;
 
-    // Validate email & password
     if (!email || !password) {
-        return res.status(400).json({
+        res.status(400).json({
             success: false,
             error: 'Please provide email and password'
         });
+        return;
     }
 
     const user = await User.findOne({ email }).select('+password');
 
     if (!user) {
-        return res.status(401).json({
+        res.status(401).json({
             success: false,
             error: 'Invalid credentials'
         });
+        return;
     }
 
-    // Check if email is verified
     if (!user.isEmailVerified) {
-        return res.status(401).json({
+        res.status(401).json({
             success: false,
             error: 'Please verify your email before logging in'
         });
+        return;
     }
 
-    // Check if password matches
     const isMatch = await user.matchPassword(password);
 
     if (!isMatch) {
-        return res.status(401).json({
+        res.status(401).json({
             success: false,
             error: 'Invalid credentials'
         });
+        return;
     }
 
-    // Create token
     const token = user.getSignedJwtToken();
 
     res.status(200).json({
@@ -196,8 +198,9 @@ exports.login = asyncHandler(async (req, res) => {
     });
 });
 
-exports.getMe = asyncHandler(async (req, res) => {
-    const user = await User.findById(req.user.id);
+
+export const getMe = asyncHandlerWrapper(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    const user = await User.findById(req.user?.id);
 
     res.status(200).json({
         success: true,
@@ -205,43 +208,36 @@ exports.getMe = asyncHandler(async (req, res) => {
     });
 });
 
+// ─── Resend Verification ─────────────────────────────────────────────────────
 
-exports.resendVerification = asyncHandler(async (req, res) => {
+export const resendVerification = asyncHandlerWrapper(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { email } = req.body;
 
-    const user = await PendingUser.findOne({ email });
-    if (!user) {
-        return res.status(404).json({
+    const pendingUser = await PendingUser.findOne({ email });
+
+    if (!pendingUser) {
+        res.status(404).json({
             success: false,
-            error: 'No user found with that email'
+            error: 'No pending registration found with that email'
         });
+        return;
     }
 
-    if (user.isEmailVerified) {
-        return res.status(400).json({
-            success: false,
-            error: 'Email is already verified'
-        });
-    }
-
-    // Generate new verification token
-    const verificationToken = user.getEmailVerificationToken();
-    await user.save();
-
+    const verificationToken = pendingUser.getEmailVerificationToken();
+    await pendingUser.save();
 
     const verificationUrl = `${process.env.CLIENT_URL}/verify-email/${verificationToken}`;
 
-    // Email message
     const message = `
-    <h1> Email Verification</h1>
-    <p>Please verify your email by clicking the link below:</p>
-    <a href="${verificationUrl}" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">Verify Email</a>
-    <p>Or copy this link: ${verificationUrl}</p>
-    <p>This link will expire in 10 minutes.</p>
-`;
+        <h1>Email Verification</h1>
+        <p>Please verify your email by clicking the link below:</p>
+        <a href="${verificationUrl}" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">Verify Email</a>
+        <p>Or copy this link: ${verificationUrl}</p>
+        <p>This link will expire in 10 minutes.</p>
+    `;
 
     await sendEmail({
-        email: user.email,
+        email: pendingUser.email,
         subject: 'Email Verification - TaskFlow Lite',
         message
     });
