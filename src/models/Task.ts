@@ -58,6 +58,10 @@ const taskSchema = new Schema<ITask>({
             default: Date.now
         }
     }],
+    completed: {
+        type: Boolean,
+        default: false
+    },
     completedAt: {
         type: Date
     },

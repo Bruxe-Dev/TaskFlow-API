@@ -187,6 +187,7 @@ export interface ITask extends Document {
         url: string;
         uploadedAt: Date;
     }[];
+    completed: Boolean
     createdAt: Date;
     completedAt: Date | undefined;
 }
