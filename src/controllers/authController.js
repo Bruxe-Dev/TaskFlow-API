@@ -1,9 +1,9 @@
-const User = require('../models/User');
-const PendingUser = require('../models/pendingUser');
-const asyncHandler = require('../middleware/asyncHandlewrapp');
-const sendEmail = require('../utils/sendEmail');
-const crypto = require('crypto');
-const bcrypt = require('bcryptjs');
+import User from '../models/User'
+import pendingUser from '../models/pendingUser'
+import asyncHandleWrapper from '../middleware/asyncHandlewrapp';
+import sendEmail from '../utils/sendEmail';
+import crypto from 'crypto'
+import bcrypt from 'bcrypt'
 
 exports.register = asyncHandler(async (req, res) => {
     const { username, email, password } = req.body;
