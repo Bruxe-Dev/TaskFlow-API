@@ -1,16 +1,15 @@
-const express = require('express');
-const router = express.Router();
-const User = require('../models/User');
+import express, { Router } from 'express'
+import User from '../models/User'
 
-const {
+import {
     register,
     verifyEmail,
     login,
     getMe,
     resendVerification
-} = require('../controllers/authController');
+} from '../controllers/authController';
 
-const { protect } = require('../middleware/auth')
+import { protect } from '../middleware/auth'
 
 //Public Routes
 
@@ -21,4 +20,4 @@ router.post('/resend-verification', resendVerification)
 
 router.get('/me', protect, getMe)
 
-module.exports = router;
+export default router
