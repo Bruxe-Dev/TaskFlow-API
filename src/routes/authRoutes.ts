@@ -18,8 +18,8 @@ router.post('/register', register);
 router.get('/verify-email/:token', verifyEmail);
 router.post('/login', login);
 router.post('/resend-verification', resendVerification);
-router.put('/update-profile', protect, update_profile)
 
+router.put('/update-profile', protect, update_profile)
 router.get('/me', protect, getMe)
 
 export default router
