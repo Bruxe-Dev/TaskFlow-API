@@ -77,7 +77,6 @@ export const verifyEmail = asyncHandleWrapper(async (req: Request, res: Response
 
     const { token: verificationToken } = req.params;
 
-    // ✅ Bug 3 fixed — validate token is a plain string not an array
     if (!verificationToken || Array.isArray(verificationToken)) {
         res.status(400).json({ success: false, error: 'Verification token is missing or invalid' });
         return;
@@ -105,11 +104,14 @@ export const verifyEmail = asyncHandleWrapper(async (req: Request, res: Response
         return;
     }
 
+    const avatar = `https://api.dicebear.com/7.x/initials/svg?seed=${pendingUser.username}`
+
     const user = await User.create({
         username: pendingUser.username,
         email: pendingUser.email,
         password: pendingUser.password,
-        isEmailVerified: true
+        isEmailVerified: true,
+        avatar
     });
 
     console.log('User created:', user._id);
@@ -198,15 +200,15 @@ export const resendVerification = asyncHandleWrapper(async (req: Request, res: R
     const verificationToken = pendingUser.getEmailVerificationToken();
     await pendingUser.save();
 
-    const verificationUrl = `${process.env.CLIENT_URL}/verify-email/${verificationToken}`;
+    const verificationUrl = `${process.env.CLIENT_URL}/verify-email/${verificationToken} `;
 
     const message = `
-        <h1>Email Verification</h1>
-        <p>Please verify your email by clicking the link below:</p>
-        <a href="${verificationUrl}" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">Verify Email</a>
-        <p>Or copy this link: ${verificationUrl}</p>
-        <p>This link will expire in 10 minutes.</p>
-    `;
+        < h1 > Email Verification </h1>
+            < p > Please verify your email by clicking the link below: </p>
+                < a href = "${verificationUrl}" style = "display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;" > Verify Email </a>
+                    < p > Or copy this link: ${verificationUrl} </p>
+                        < p > This link will expire in 10 minutes.</p>
+                            `;
 
     await sendEmail({ email: pendingUser.email, subject: 'Email Verification - TaskFlow Lite', message });
 
@@ -214,5 +216,5 @@ export const resendVerification = asyncHandleWrapper(async (req: Request, res: R
 });
 
 export const update_profile = asyncHandleWrapper(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    const user_id = req.user.id
+    const user_id = req.user?.id
 })
