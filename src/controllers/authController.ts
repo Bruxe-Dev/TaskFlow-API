@@ -214,7 +214,26 @@ export const resendVerification = asyncHandleWrapper(async (req: Request, res: R
 
     res.status(200).json({ success: true, message: 'Verification email sent' });
 });
+export const update_profile = asyncHandleWrapper(async (req: Request, res: Response): Promise<void> => {
+    const user_id = req.user?.id;
 
-export const update_profile = asyncHandleWrapper(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    const user_id = req.user?.id
-})
+    const { username, avatar } = req.body;
+
+    const user = await User.findById(user_id);
+
+    if (!user) {
+        res.status(404).json({ success: false, error: "User not found" });
+        return;
+    }
+
+    if (username) user.username = username;
+    if (avatar) user.avatar = avatar;
+
+    await user.save();
+
+    res.status(200).json({
+        success: true,
+        message: "Profile updated successfully",
+        data: user
+    });
+});
