@@ -67,7 +67,6 @@ const userSchema = new Schema<IUser>({
     },
     emailVerificationToken: String,
     emailVerificationExpire: Date,
-    profilePicture: String,
     createdAt: {
         type: Date,
         default: Date.now
@@ -75,6 +74,10 @@ const userSchema = new Schema<IUser>({
     lastActive: {
         type: Date,
         default: Date.now
+    },
+    avatar: {
+        type: String,
+        default: "https://api.dicebear.com/7.x/initials/svg?seed=User"
     }
 });
 

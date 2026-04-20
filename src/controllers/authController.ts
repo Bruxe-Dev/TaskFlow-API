@@ -16,7 +16,7 @@ declare global {
 
 // ─── Register ────────────────────────────────────────────────────────────────
 
-export const register = asyncHandleWrapper(async (req: Request, res: Response, next: NextFunction): Promise<void> => {  // ✅ Bug 1 fixed
+export const register = asyncHandleWrapper(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { username, email, password } = req.body;
 
     console.log('CLIENT_URL:', process.env.CLIENT_URL);
@@ -72,10 +72,10 @@ export const register = asyncHandleWrapper(async (req: Request, res: Response, n
 
 // ─── Verify Email ─────────────────────────────────────────────────────────────
 
-export const verifyEmail = asyncHandleWrapper(async (req: Request, res: Response, next: NextFunction): Promise<void> => {  // ✅ Bug 1 fixed
+export const verifyEmail = asyncHandleWrapper(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     console.log('Verify email called with token:', req.params.token);
 
-    const { token: verificationToken } = req.params;  // ✅ Bug 2 fixed — renamed to avoid conflict with JWT token below
+    const { token: verificationToken } = req.params;
 
     // ✅ Bug 3 fixed — validate token is a plain string not an array
     if (!verificationToken || Array.isArray(verificationToken)) {
@@ -134,7 +134,7 @@ export const verifyEmail = asyncHandleWrapper(async (req: Request, res: Response
 
 // ─── Login ────────────────────────────────────────────────────────────────────
 
-export const login = asyncHandleWrapper(async (req: Request, res: Response, next: NextFunction): Promise<void> => {  // ✅ Bug 1 fixed
+export const login = asyncHandleWrapper(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { email, password } = req.body;
 
     if (!email || !password) {
@@ -177,7 +177,7 @@ export const login = asyncHandleWrapper(async (req: Request, res: Response, next
 
 // ─── Get Me ───────────────────────────────────────────────────────────────────
 
-export const getMe = asyncHandleWrapper(async (req: Request, res: Response, next: NextFunction): Promise<void> => {  // ✅ Bug 1 fixed
+export const getMe = asyncHandleWrapper(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const user = await User.findById(req.user?.id);
 
     res.status(200).json({ success: true, data: user });
@@ -185,7 +185,7 @@ export const getMe = asyncHandleWrapper(async (req: Request, res: Response, next
 
 // ─── Resend Verification ──────────────────────────────────────────────────────
 
-export const resendVerification = asyncHandleWrapper(async (req: Request, res: Response, next: NextFunction): Promise<void> => {  // ✅ Bug 1 fixed
+export const resendVerification = asyncHandleWrapper(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { email } = req.body;
 
     const pendingUser = await PendingUser.findOne({ email });
@@ -212,3 +212,7 @@ export const resendVerification = asyncHandleWrapper(async (req: Request, res: R
 
     res.status(200).json({ success: true, message: 'Verification email sent' });
 });
+
+export const update_profile = asyncHandleWrapper(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    const user_id = req.user.id
+})

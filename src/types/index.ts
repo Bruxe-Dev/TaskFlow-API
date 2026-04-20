@@ -115,7 +115,7 @@ export interface IUser extends Document {
     isEmailVerified: boolean;
     emailVerificationToken?: string;
     emailVerificationExpire?: Date;
-    profilePicture: string;
+    avatar: string;
     createdAt: Date;
     lastActive: Date;
 
