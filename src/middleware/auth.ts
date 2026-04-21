@@ -30,7 +30,17 @@ export const protect = async (
     }
 
     try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as { id: string }
 
+        const user = await User.findById(decoded.id)
+
+        if (!user) {
+            res.status(404).json({
+                success: false,
+                message: "User Doesn't exist"
+            })
+            return;
+        }
     } catch (error) {
 
     }
