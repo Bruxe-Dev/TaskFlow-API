@@ -41,6 +41,14 @@ export const protect = async (
             })
             return;
         }
+
+        if (!user.isEmailVerified) {
+            res.status(403).json({
+                success: false,
+                message: "Verify your email first to proceed"
+            })
+            return;
+        }
     } catch (error) {
 
     }
