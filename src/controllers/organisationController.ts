@@ -249,3 +249,78 @@ export const getOrganizationFields = asyncHandleWrapper(async (req: AuthRequest,
         data: organization.fields
     })
 })
+
+/**
+ * @desc
+ * @access
+ * @route
+ */
+
+export const createField = asyncHandleWrapper(async (req: AuthRequest, res: Response) => {
+    const { name, description, adminId, color, icon } = req.body;
+
+    const organization = await Organization.findById(req.params.id)
+
+    if (!organization) {
+        res.status(404).json({
+            success: false,
+            message: "Organization Not Found"
+        })
+        return;
+    }
+
+    if (organization.activeAdmins >= organization.maxAdmins) {
+        res.status(400).json({
+            success: false,
+            message: "Maximun Fields Reached"
+        })
+        return;
+    }
+
+    const admin = await User.findById(adminId);
+
+    if (!admin) {
+        res.status(404).json({
+            success: false,
+            error: 'Admin user not found'
+        });
+        return;
+    }
+
+    if (admin.organization?.toString() !== organization._id.toString()) {
+        res.status(400).json({
+            success: false,
+            error: 'Admin must be a member of this organization'
+        });
+        return;
+    }
+
+    const field = await Field.create({
+        name,
+        description,
+        organization: organization._id,
+        admin: adminId,
+        color,
+        icon
+    });
+
+    organization.fields.push(field._id);
+    organization.activeAdmins += 1;
+    await organization.save();
+
+    await User.findByIdAndUpdate(adminId, {
+        role: UserRole.FIELD_ADMIN,
+        field: field._id,
+        permissions: {
+            canCreateTeams: true,
+            canAssignTasks: true,
+            canReviewSubmissions: true
+        }
+    });
+
+    res.status(201).json({
+        success: true,
+        message: 'Field created successfully',
+        data: field
+    });
+});

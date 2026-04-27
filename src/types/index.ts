@@ -78,8 +78,8 @@ export interface IOrganisation extends Document {
     description?: string;
     industry?: string;
     leader: Types.ObjectId;
-    maxAdmins: Number;
-    activeAdmins: Number;
+    maxAdmins: number;
+    activeAdmins: number;
     fields: Types.ObjectId[];
     settings: {
         allowCrossFieldAccess: boolean;
