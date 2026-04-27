@@ -11,4 +11,6 @@ import { Auth } from "mongodb";
  * @route
  */
 
-export const getOrganisation = asyncHandleWrapper(async (Req: AuthRequest, req: Request))
+export const getOrganisation = asyncHandleWrapper(async (Req: AuthRequest, req: Request) => {
+
+})
