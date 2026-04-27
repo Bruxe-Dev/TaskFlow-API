@@ -324,3 +324,91 @@ export const createField = asyncHandleWrapper(async (req: AuthRequest, res: Resp
         data: field
     });
 });
+
+/**
+ * @desc    Get organization statistics
+ * @route   GET /api/organizations/:id/stats
+ * @access  Private (organization leader only)
+ */
+export const getOrganizationStats = asyncHandleWrapper(async (req: AuthRequest, res: Response) => {
+    const organization = await Organization.findById(req.params.id);
+
+    if (!organization) {
+        res.status(404).json({
+            success: false,
+            error: 'Organization not found'
+        });
+        return;
+    }
+
+    // Get various statistics
+    const totalMembers = await User.countDocuments({ organization: organization._id });
+    const totalLeaders = await User.countDocuments({
+        organization: organization._id,
+        role: UserRole.ORG_LEADER
+    });
+    const totalAdmins = await User.countDocuments({
+        organization: organization._id,
+        role: UserRole.FIELD_ADMIN
+    });
+    const totalRegularMembers = await User.countDocuments({
+        organization: organization._id,
+        role: UserRole.MEMBER
+    });
+
+    res.status(200).json({
+        success: true,
+        data: {
+            members: {
+                total: totalMembers,
+                leaders: totalLeaders,
+                admins: totalAdmins,
+                regularMembers: totalRegularMembers
+            },
+            fields: {
+                total: organization.fields.length,
+                activeAdmins: organization.activeAdmins,
+                maxAdmins: organization.maxAdmins,
+                availableSlots: organization.maxAdmins - organization.activeAdmins
+            }
+        }
+    });
+});
+
+/**
+ * @desc    Update organization settings
+ * @route   PUT /api/organizations/:id/settings
+ * @access  Private (organization leader only)
+ */
+export const updateOrganizationSettings = asyncHandleWrapper(async (req: AuthRequest, res: Response) => {
+    const { allowCrossFieldAccess, requireAccessRequestApproval, aiEnabled } = req.body;
+
+    const organization = await Organization.findById(req.params.id);
+
+    if (!organization) {
+        res.status(404).json({
+            success: false,
+            error: 'Organization not found'
+        });
+        return;
+    }
+
+    // Update settings
+    if (allowCrossFieldAccess !== undefined) {
+        organization.settings.allowCrossFieldAccess = allowCrossFieldAccess;
+    }
+    if (requireAccessRequestApproval !== undefined) {
+        organization.settings.requireAccessRequestApproval = requireAccessRequestApproval;
+    }
+    if (aiEnabled !== undefined) {
+        organization.settings.aiEnabled = aiEnabled;
+    }
+
+    await organization.save();
+
+    res.status(200).json({
+        success: true,
+        message: 'Organization settings updated successfully',
+        data: organization.settings
+    });
+});
