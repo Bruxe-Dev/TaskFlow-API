@@ -114,3 +114,47 @@ export const updateOrganization = asyncHandleWrapper(async (req: AuthRequest, re
         data: organization
     })
 })
+
+/**
+ * @access
+ * @desc 
+ * @route
+ */
+
+export const deleteOrganization = asyncHandleWrapper(async (req: AuthRequest, res: Response) => {
+    const organization = await Organization.findById(req.params.id);
+
+    if (!organization) {
+        res.status(404).json({
+            success: false,
+            message: "Organization Not Found"
+        })
+        return;
+    }
+
+    if (organization.leader.toString() !== req.user?._id.toString()) {
+        res.status(403).json({
+            success: false,
+            message: "UNAUTHORIZED"
+        })
+        return;
+    }
+
+    // TODO: In production, I will:
+    // 1. Archive instead of delete
+    // 2. Transfer ownership
+    // 3. Delete all related data (fields, teams, etc.)
+
+    await organization.deleteOne();
+
+    await User.updateMany(
+        { organization: organization._id },
+        { $unset: { organization: 1 }, role: UserRole.MEMBER }
+    );
+
+    res.status(200).json({
+        success: true,
+        message: "Organization deleted Successfully"
+    })
+})
+
