@@ -218,3 +218,34 @@ export const getOrganizationDashboard = asyncHandleWrapper(async (req: AuthReque
         }
     });
 });
+
+/**
+ * @desc
+ * @route
+ * @access
+ */
+
+export const getOrganizationFields = asyncHandleWrapper(async (req: AuthRequest, res: Response) => {
+    const organization = await Organization.findById(req.params.id)
+        .populate({
+            path: 'fields',
+            populate: {
+                path: 'admin teams',
+                select: 'username email name'
+            }
+        });
+
+    if (!organization) {
+        res.status(404).json({
+            success: false,
+            message: "Organization Not Found"
+        })
+        return;
+    }
+
+    res.status(200).json({
+        success: true,
+        count: organization.fields.length,
+        data: organization.fields
+    })
+})
