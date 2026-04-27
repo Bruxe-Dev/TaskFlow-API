@@ -66,10 +66,6 @@ export const protect = async (
     }
 };
 
-/**
- * Authorize roles - Restrict access to specific user roles
- * Usage: authorize(UserRole.ORG_LEADER, UserRole.FIELD_ADMIN)
- */
 export const authorize = (...roles: UserRole[]) => {
     return (req: AuthRequest, res: Response, next: NextFunction): void => {
         if (!req.user) {
@@ -127,9 +123,6 @@ export const checkOrganization = (orgIdParam: string = 'id') => {
     };
 };
 
-/**
- * Check if user is organization leader
- */
 export const isOrgLeader = async (
     req: AuthRequest,
     res: Response,

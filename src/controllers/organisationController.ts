@@ -1,7 +1,7 @@
 import { Response } from "express";
 import { UserRole } from "../types";
 import { Organization, User, Field } from "../models";
-import { AuthRequest } from "../types";
+import { AuthRequest } from "../middleware/auth";
 import asyncHandleWrapper from "../middleware/asyncHandlewrapp";
 import { Auth } from "mongodb";
 
@@ -11,6 +11,13 @@ import { Auth } from "mongodb";
  * @route
  */
 
-export const getOrganisation = asyncHandleWrapper(async (Req: AuthRequest, req: Request) => {
+export const getOrganisation = asyncHandleWrapper(async (req: AuthRequest, res: Response) => {
+    const { name, description, industry } = req.body;
 
+    if (req.user?.organization) {
+        res.status(400).json({
+            success: false,
+            message: "You are already enrolled in this Organization! Leave you current Organization first"
+        })
+    }
 })
