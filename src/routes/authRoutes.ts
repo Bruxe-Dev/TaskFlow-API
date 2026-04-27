@@ -10,7 +10,7 @@ import {
     update_profile
 } from '../controllers/authController';
 
-import protect from '../middleware/auth'
+import { protect } from '../middleware/auth'
 const router: Router = express.Router()
 //Public Routes
 
