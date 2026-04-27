@@ -6,9 +6,9 @@ import asyncHandleWrapper from "../middleware/asyncHandlewrapp";
 import { Auth } from "mongodb";
 
 /**
- * @desc
- * @access
- * @route
+ * @desc Create a new Organization
+ * @access Private (any authenticate user can create one) 
+ * @route POST /api/organizations
  */
 
 export const createOrganization = asyncHandleWrapper(async (req: AuthRequest, res: Response) => {
@@ -44,9 +44,9 @@ export const createOrganization = asyncHandleWrapper(async (req: AuthRequest, re
 })
 
 /**
- * @desc 
- * @access
- * @route
+ * @desc Get Organization details
+ * @access Private (Only Organization members)
+ * @route GET /api/organizations/:id
  */
 
 export const getOrganization = asyncHandleWrapper(async (req: AuthRequest, res: Response) => {
@@ -76,9 +76,9 @@ export const getOrganization = asyncHandleWrapper(async (req: AuthRequest, res: 
 })
 
 /**
- * @desc 
- * @access
- * @route
+ * @desc Update Organization details
+ * @access Private (Organization Leader)
+ * @route PUT /api/organizations/:id
  */
 
 export const updateOrganization = asyncHandleWrapper(async (req: AuthRequest, res: Response) => {
@@ -116,9 +116,9 @@ export const updateOrganization = asyncHandleWrapper(async (req: AuthRequest, re
 })
 
 /**
- * @access
- * @desc 
- * @route
+ * @access Private (Organization Leader)
+ * @desc Deleting an Organization 
+ * @route DELETE /api/organizations/:id
  */
 
 export const deleteOrganization = asyncHandleWrapper(async (req: AuthRequest, res: Response) => {
@@ -159,9 +159,9 @@ export const deleteOrganization = asyncHandleWrapper(async (req: AuthRequest, re
 })
 
 /**
- * @desc
- * @route
- * @access
+ * @desc Get dashboard for the Organization
+ * @route GET /api/organizations/:id/dashboard
+ * @access Private (Organization Leader only)
  */
 
 export const getOrganizationDashboard = asyncHandleWrapper(async (req: AuthRequest, res: Response) => {
@@ -220,9 +220,9 @@ export const getOrganizationDashboard = asyncHandleWrapper(async (req: AuthReque
 });
 
 /**
- * @desc
- * @route
- * @access
+ * @desc Get all field in an Organization
+ * @route GET /api/organizations/:id/fields
+ * @access Private (Organization members only)
  */
 
 export const getOrganizationFields = asyncHandleWrapper(async (req: AuthRequest, res: Response) => {
@@ -251,9 +251,9 @@ export const getOrganizationFields = asyncHandleWrapper(async (req: AuthRequest,
 })
 
 /**
- * @desc
- * @access
- * @route
+ * @desc Creating a new Field in the Organization
+ * @access Private (Only Organization leaders)
+ * @route POST api/organizations/:id/fields
  */
 
 export const createField = asyncHandleWrapper(async (req: AuthRequest, res: Response) => {
