@@ -158,3 +158,63 @@ export const deleteOrganization = asyncHandleWrapper(async (req: AuthRequest, re
     })
 })
 
+/**
+ * @desc
+ * @route
+ * @access
+ */
+
+export const getOrganizationDashboard = asyncHandleWrapper(async (req: AuthRequest, res: Response) => {
+    const organization = await Organization.findById(req.params.id)
+        .populate({
+            path: 'fields',
+            populate: {
+                path: 'admin teams',
+                select: 'username email name'
+            }
+        });
+
+    if (!organization) {
+        res.status(404).json({
+            success: false,
+            message: "Organization Not Found"
+        })
+        return;
+    }
+
+    const totalMembers = await User.countDocuments({ organization: organization._id })
+    const fieldStats = await Promise.all(
+        organization.fields.map(async (fieldId) => {
+            const field = await Field.findById(fieldId)
+                .populate('admin', 'username email')
+                .populate('teams');
+
+            return {
+                fieldId: field?._id,
+                fieldName: field?.name,
+                admin: field?.admin,
+                teamCount: field?.teams.length || 0
+            };
+        })
+    );
+
+    res.status(200).json({
+        success: true,
+        data: {
+            organization: {
+                _id: organization._id,
+                name: organization.name,
+                description: organization.description,
+                industry: organization.industry,
+                leader: organization.leader
+            },
+            stats: {
+                totalMembers,
+                totalFields: organization.fields.length,
+                activeAdmins: organization.activeAdmins,
+                maxAdmins: organization.maxAdmins
+            },
+            fields: fieldStats
+        }
+    });
+});
