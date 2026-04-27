@@ -74,3 +74,43 @@ export const getOrganization = asyncHandleWrapper(async (req: AuthRequest, res: 
         data: organization
     })
 })
+
+/**
+ * @desc 
+ * @access
+ * @route
+ */
+
+export const updateOrganization = asyncHandleWrapper(async (req: AuthRequest, res: Response) => {
+    const { name, description, industry } = req.body;
+
+    const organization = await Organization.findById(req.params.id)
+
+    if (!organization) {
+        res.status(404).json({
+            success: false,
+            message: "Organization Not Found"
+        })
+        return;
+    }
+
+    if (organization?.leader.toString() !== req.user?._id.toString()) {
+        res.status(403).json({
+            success: false,
+            message: "UNAUTHORIZED, Please contact the Organization owner"
+        })
+        return;
+    }
+
+    if (name) organization.name = name;
+    if (description) organization.description = description;
+    if (industry) organization.industry = industry;
+
+    await organization?.save()
+
+    res.status(200).json({
+        success: true,
+        message: "Organization Updated Successfully",
+        data: organization
+    })
+})
