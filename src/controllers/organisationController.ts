@@ -11,7 +11,7 @@ import { Auth } from "mongodb";
  * @route
  */
 
-export const getOrganisation = asyncHandleWrapper(async (req: AuthRequest, res: Response) => {
+export const createOrganization = asyncHandleWrapper(async (req: AuthRequest, res: Response) => {
     const { name, description, industry } = req.body;
 
     if (req.user?.organization) {
@@ -34,5 +34,43 @@ export const getOrganisation = asyncHandleWrapper(async (req: AuthRequest, res: 
     await User.findByIdAndUpdate(req.user?._id, {
         role: UserRole.ORG_LEADER,
         organization: organization._id
+    })
+
+    res.status(200).json({
+        success: true,
+        message: "Organization Successfully created. You are now the owner of the Organization",
+        data: organization
+    })
+})
+
+/**
+ * @desc 
+ * @access
+ * @route
+ */
+
+export const getOrganization = asyncHandleWrapper(async (req: AuthRequest, res: Response) => {
+    const organization = await Organization.findById(req.params.id)
+        .populate('leader', 'username email')
+        .populate('fields');
+
+    if (!organization) {
+        res.status(404).json({
+            success: false,
+            message: "No Organisation found"
+        })
+        return;
+    }
+
+    if (organization.leader.toString() !== req.user?._id.toString()) {
+        res.status(403).json({
+            success: false,
+            message: "Unauthorized, Please contact Organization Owner"
+        })
+    }
+
+    res.status(200).json({
+        success: true,
+        data: organization
     })
 })
