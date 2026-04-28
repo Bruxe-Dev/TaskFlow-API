@@ -192,7 +192,7 @@ export const getTeam = asyncHandleWrapper(async (req: AuthRequest, res: Response
 /**
  * @desc Update team (either members or assign new tasks)
  * @route PUT /api/teams/:id
- * @access Private (Only Field Admins can update the Teams)
+ * @access Private (Only Field Admins and team leaders can update the Teams)
  */
 
 export const updateTeam = asyncHandleWrapper(async (req: AuthRequest, res: Response) => {
@@ -223,7 +223,7 @@ export const updateTeam = asyncHandleWrapper(async (req: AuthRequest, res: Respo
     const isFieldAdmin = field.admin.toString() === req.user?._id.toString()
     const isTeamLeader = team.teamLeader.toString() === req.user?._id.toString()
 
-    // Check if user is the field admin
+    // Check if user is the field admin or team leader
     if (!isFieldAdmin || !isTeamLeader) {
         res.status(403).json({
             success: false,
