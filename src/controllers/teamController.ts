@@ -153,6 +153,7 @@ export const createTeam = asyncHandleWrapper(async (req: AuthRequest, res: Respo
 
 export const getTeam = asyncHandleWrapper(async (req: AuthRequest, res: Response) => {
     const team = await Team.findById(req.params.id)
+        .populate('teamLeader', 'username email profilePicture role')
         .populate('members.user', 'username email profilePicture role')
         .populate('workspace')
         .populate('field', 'name admin')
@@ -197,7 +198,9 @@ export const getTeam = asyncHandleWrapper(async (req: AuthRequest, res: Response
 export const updateTeam = asyncHandleWrapper(async (req: AuthRequest, res: Response) => {
     const { name, description } = req.body;
 
-    const team = await Team.findById(req.params.id).populate('field');
+    const team = await Team.findById(req.params.id).populate('field')
+        .populate('teamLeader', 'username email profilePicture')
+        .populate('members.user', 'username email profilePicture');
 
     if (!team) {
         res.status(404).json({
@@ -238,6 +241,12 @@ export const updateTeam = asyncHandleWrapper(async (req: AuthRequest, res: Respo
         data: team
     });
 });
+
+/**
+ * @desc    Delete a team
+ * @route   DELETE /api/teams/:id
+ * @access  Private (field admin only)
+ */
 export const deleteTeam = asyncHandleWrapper(async (req: AuthRequest, res: Response) => {
     const team = await Team.findById(req.params.id);
 
