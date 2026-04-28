@@ -11,7 +11,7 @@ import asyncHandleWrapper from "../middleware/asyncHandlewrapp";
  */
 
 export const createTeam = asyncHandleWrapper(async (req: AuthRequest, res: Response) => {
-    const { name, description, fieldId, memberIds } = req.body;
+    const { name, description, fieldId, teamLeaderId, memberIds } = req.body;
 
     // Verify field exists
     const field = await Field.findById(fieldId);
@@ -33,29 +33,62 @@ export const createTeam = asyncHandleWrapper(async (req: AuthRequest, res: Respo
         return;
     }
 
+    // Verify team leader exists and belongs to organization
+    if (!teamLeaderId) {
+        res.status(400).json({
+            success: false,
+            error: 'Team leader is required'
+        });
+        return;
+    }
+
+    const teamLeader = await User.findById(teamLeaderId);
+
+    if (!teamLeader) {
+        res.status(404).json({
+            success: false,
+            error: 'Team leader not found'
+        });
+        return;
+    }
+
+    if (teamLeader.organization?.toString() !== field.organization.toString()) {
+        res.status(400).json({
+            success: false,
+            error: 'Team leader must belong to the same organization'
+        });
+        return;
+    }
+
     // Verify all members belong to the same organization
+    let allMemberIds = [teamLeaderId];  // Include team leader in members
     if (memberIds && memberIds.length > 0) {
-        const members = await User.find({ _id: { $in: memberIds } });
+        allMemberIds = [...allMemberIds, ...memberIds];
+    }
 
-        if (members.length !== memberIds.length) {
-            res.status(404).json({
-                success: false,
-                error: 'One or more members not found'
-            });
-            return;
-        }
+    // Remove duplicates
+    allMemberIds = [...new Set(allMemberIds)];
 
-        const invalidMembers = members.filter(
-            (member) => member.organization?.toString() !== field.organization.toString()
-        );
+    const members = await User.find({ _id: { $in: allMemberIds } });
 
-        if (invalidMembers.length > 0) {
-            res.status(400).json({
-                success: false,
-                error: 'All team members must belong to the same organization'
-            });
-            return;
-        }
+    if (members.length !== allMemberIds.length) {
+        res.status(404).json({
+            success: false,
+            error: 'One or more members not found'
+        });
+        return;
+    }
+
+    const invalidMembers = members.filter(
+        (member) => member.organization?.toString() !== field.organization.toString()
+    );
+
+    if (invalidMembers.length > 0) {
+        res.status(400).json({
+            success: false,
+            error: 'All team members must belong to the same organization'
+        });
+        return;
     }
 
     // Create the team
@@ -64,11 +97,12 @@ export const createTeam = asyncHandleWrapper(async (req: AuthRequest, res: Respo
         description,
         field: fieldId,
         organization: field.organization,
-        members: memberIds ? memberIds.map((userId: string, index: number) => ({
+        teamLeader: teamLeaderId,  // 
+        members: allMemberIds.map((userId: string) => ({
             user: userId,
-            role: index === 0 ? 'lead' : 'member',  // First member is team lead
+            role: userId === teamLeaderId ? 'lead' : 'member',  // Leader gets 'lead' role
             joinedAt: new Date()
-        })) : []
+        }))
     });
 
     // Create workspace for the team
@@ -83,20 +117,23 @@ export const createTeam = asyncHandleWrapper(async (req: AuthRequest, res: Respo
         }
     });
 
+    // Update team with workspace reference
     team.workspace = workspace._id;
     await team.save();
 
+    // Update field with new team
     field.teams.push(team._id);
     await field.save();
 
-    if (memberIds && memberIds.length > 0) {
-        await User.updateMany(
-            { _id: { $in: memberIds } },
-            { $push: { teams: team._id } }
-        );
-    }
+    // Update users to add team reference
+    await User.updateMany(
+        { _id: { $in: allMemberIds } },
+        { $push: { teams: team._id } }
+    );
 
+    // Populate the response
     const populatedTeam = await Team.findById(team._id)
+        .populate('teamLeader', 'username email profilePicture')
         .populate('members.user', 'username email profilePicture')
         .populate('workspace')
         .populate('field', 'name');
