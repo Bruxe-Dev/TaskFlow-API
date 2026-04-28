@@ -107,3 +107,46 @@ export const createTeam = asyncHandleWrapper(async (req: AuthRequest, res: Respo
         data: populatedTeam
     });
 });
+
+/**
+ * @desc Get team details in the Field
+ * @route GET /api/teams/:id
+ * @access Private (Team Members + Team Admin + Org Leader)
+ */
+
+export const getTeam = asyncHandleWrapper(async (req: AuthRequest, res: Response) => {
+    const team = await Team.findById(req.params.id)
+        .populate('members.user', 'username email profilePicture role')
+        .populate('workspace')
+        .populate('field', 'name admin')
+        .populate('organization', 'name');
+
+
+    if (!team) {
+        res.status(404).json({
+            success: false,
+            message: "Team Not Found"
+        })
+    }
+
+    const isMember = team?.members.some(
+        (member: any) => member.user._id.toString() === req.user?._id.toString()
+    )
+    const field = await Field.findById(team?.field)
+    const isFieldAdmin =
+        field?.admin.toString() === req.user?._id.toString()
+    const isOrgLeader =
+        req.user?.role === UserRole.ORG_LEADER
+
+    if (!isMember && !isFieldAdmin && isOrgLeader) {
+        res.status(403).json({
+            success: false,
+            message: "UNAUTHORIZED!"
+        })
+    }
+
+    res.status(200).json({
+        success: true,
+        data: team
+    })
+})
