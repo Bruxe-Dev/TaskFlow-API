@@ -3,6 +3,7 @@ import { Document, Types } from 'mongoose';
 export enum UserRole {
     ORG_LEADER = 'org_leader',
     FIELD_ADMIN = 'field_admin',
+    TEAM_LEADER = 'team_leader',
     MEMBER = 'member'
 }
 
@@ -141,6 +142,7 @@ export interface ITeam extends Document {
     name: string;
     description?: string;
     field: Types.ObjectId;
+    leader: Types.ObjectId;
     organization: Types.ObjectId;
     members: {
         user: Types.ObjectId;
