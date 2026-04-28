@@ -5,9 +5,9 @@ import { UserRole } from "../types";
 import { Request, Response } from "express";
 
 /**
- * @desc
- * @route
- * @access
+ * @desc get field details
+ * @route GET /api/fields/:id
+ * @access Private (Field Members only)
  */
 
 export const getField = asyncHandleWrapper(async (req: AuthRequest, res: Response) => {
@@ -52,9 +52,9 @@ export const getField = asyncHandleWrapper(async (req: AuthRequest, res: Respons
 })
 
 /**
- * @desc    
- * @route
- * @access
+ * @desc Updating Field Details 
+ * @route PUT /api/fields/:id
+ * @access Private (Field Admin Only)
  */
 
 export const updateField = asyncHandleWrapper(async (req: AuthRequest, res: Response) => {
@@ -96,9 +96,9 @@ export const updateField = asyncHandleWrapper(async (req: AuthRequest, res: Resp
 })
 
 /**
- * @desc 
- * @route
- * @access
+ * @desc Deleting a Field
+ * @route DELETE /api/fields/:id
+ * @access Private (Field Admin Only)
  */
 
 export const deleteField = asyncHandleWrapper(async (req: AuthRequest, res: Response) => {
@@ -156,9 +156,9 @@ export const deleteField = asyncHandleWrapper(async (req: AuthRequest, res: Resp
 });
 
 /**
- * @desc 
- * @route
- * @access
+ * @desc Getting Field Descriptions
+ * @route GET /api/fields/:id/teams
+ * @access Private (Field Members only)
  */
 
 export const getFieldTeams = asyncHandleWrapper(async (req: AuthRequest, res: Response) => {
@@ -193,9 +193,9 @@ export const getFieldTeams = asyncHandleWrapper(async (req: AuthRequest, res: Re
 })
 
 /**
- * @desc 
- * @route
- * @access
+ * @desc Creating a new Field
+ * @route POST /api/fields/:id/teams
+ * @access Private (Field Admins Only)
  */
 
 export const createTeam = asyncHandleWrapper(async (req: AuthRequest, res: Response) => {
