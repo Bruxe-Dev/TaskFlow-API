@@ -191,3 +191,114 @@ export const getFieldTeams = asyncHandleWrapper(async (req: AuthRequest, res: Re
         data: field.teams
     })
 })
+
+/**
+ * @desc 
+ * @route
+ * @access
+ */
+
+export const createTeam = asyncHandleWrapper(async (req: AuthRequest, res: Response) => {
+    const { name, description, membersIds } = req.body
+    const field = await Field.findById(req.params.id)
+
+    if (!Field) {
+        res.status(404).json({
+            success: false,
+            message: "Field Not Found"
+        })
+        return;
+    }
+
+    if (field?.admin.toString() !== req.user?._id) {
+        res.status(403).json({
+            success: false,
+            message: "UNAUTHORIZED"
+        })
+        return;
+    }
+
+    if (membersIds && membersIds.length > 0) {
+        const members = await User.find({ _id: { $in: membersIds } })
+
+        const invalidMembers = members.filter(
+            (member) => member.organization?.toString() !== field?.organization.toString()
+        );
+
+        if (invalidMembers.length > 0) {
+            res.status(400).json({
+                success: false,
+                error: 'All team members must belong to the same organization'
+            });
+            return;
+        }
+    }
+
+    res.status(200).json({
+        success: true,
+        message: "Team Created Successfully"
+    })
+})
+
+export const getFieldDashboard = asyncHandleWrapper(async (req: AuthRequest, res: Response) => {
+    const field = await Field.findById(req.params.id)
+        .populate('admin', 'username email')
+        .populate({
+            path: 'teams',
+            populate: {
+                path: 'workspace',
+                populate: 'projects'
+            }
+        });
+
+    if (!field) {
+        res.status(404).json({
+            success: false,
+            error: 'Field not found'
+        });
+        return;
+    }
+
+    if (field.admin.toString() !== req.user?._id.toString()) {
+        res.status(403).json({
+            success: false,
+            error: 'Only the field admin can view the dashboard'
+        });
+        return;
+    }
+
+    // Calculate statistics
+    const teamStats = await Promise.all(
+        field.teams.map(async (teamId) => {
+            const team = await Team.findById(teamId)
+                .populate('workspace')
+                .populate('members.user', 'username email');
+
+            return {
+                teamId: team?._id,
+                teamName: team?.name,
+                memberCount: team?.members.length || 0,
+                workspace: team?.workspace
+            };
+        })
+    );
+
+    res.status(200).json({
+        success: true,
+        data: {
+            field: {
+                _id: field._id,
+                name: field.name,
+                description: field.description,
+                admin: field.admin,
+                color: field.color,
+                icon: field.icon
+            },
+            stats: {
+                totalTeams: field.teams.length,
+                totalMembers: teamStats.reduce((sum, team) => sum + team.memberCount, 0)
+            },
+            teams: teamStats
+        }
+    });
+});
