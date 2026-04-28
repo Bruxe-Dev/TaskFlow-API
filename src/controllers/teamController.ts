@@ -640,3 +640,112 @@ export const getTeamStats = asyncHandleWrapper(async (req: AuthRequest, res: Res
         }
     });
 });
+
+/**
+ * @desc    Change team leader
+ * @route   PUT /api/teams/:id/leader
+ * @access  Private (field admin only)
+ */
+export const changeTeamLeader = asyncHandleWrapper(async (req: AuthRequest, res: Response) => {
+    const { newLeaderId } = req.body;
+
+    if (!newLeaderId) {
+        res.status(400).json({
+            success: false,
+            error: 'New leader ID is required'
+        });
+        return;
+    }
+
+    const team = await Team.findById(req.params.id);
+
+    if (!team) {
+        res.status(404).json({
+            success: false,
+            error: 'Team not found'
+        });
+        return;
+    }
+
+    const field = await Field.findById(team.field);
+
+    if (!field) {
+        res.status(404).json({
+            success: false,
+            error: 'Field not found'
+        });
+        return;
+    }
+
+    // Check if user is the field admin
+    if (field.admin.toString() !== req.user?._id.toString()) {
+        res.status(403).json({
+            success: false,
+            error: 'Only the field admin can change team leader'
+        });
+        return;
+    }
+
+    // Verify new leader exists
+    const newLeader = await User.findById(newLeaderId);
+
+    if (!newLeader) {
+        res.status(404).json({
+            success: false,
+            error: 'New leader not found'
+        });
+        return;
+    }
+
+    // Check if new leader belongs to same organization
+    if (newLeader.organization?.toString() !== team.organization.toString()) {
+        res.status(400).json({
+            success: false,
+            error: 'New leader must belong to the same organization'
+        });
+        return;
+    }
+
+    // Check if new leader is a team member
+    const isMember = team.members.some(
+        (member: any) => member.user.toString() === newLeaderId
+    );
+
+    if (!isMember) {
+        res.status(400).json({
+            success: false,
+            error: 'New leader must be a team member. Add them to the team first.'
+        });
+        return;
+    }
+
+    // Store old leader ID
+    const oldLeaderId = team.teamLeader.toString();
+
+    // Update team leader
+    team.teamLeader = newLeader._id;
+
+    // Update member roles
+    team.members = team.members.map((member: any) => {
+        if (member.user.toString() === newLeaderId) {
+            // New leader gets 'lead' role
+            member.role = 'lead';
+        } else if (member.user.toString() === oldLeaderId) {
+            // Old leader becomes regular member
+            member.role = 'member';
+        }
+        return member;
+    });
+
+    await team.save();
+
+    const updatedTeam = await Team.findById(team._id)
+        .populate('teamLeader', 'username email profilePicture')
+        .populate('members.user', 'username email profilePicture');
+
+    res.status(200).json({
+        success: true,
+        message: 'Team leader changed successfully',
+        data: updatedTeam
+    });
+});
