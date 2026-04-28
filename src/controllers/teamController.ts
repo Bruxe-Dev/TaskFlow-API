@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Request, response, Response } from "express";
 import { AuthRequest } from "../middleware/auth";
 import { UserRole } from "../types";
 import { Field, User, Organization, Team, Workspace } from "../models";
@@ -150,3 +150,54 @@ export const getTeam = asyncHandleWrapper(async (req: AuthRequest, res: Response
         data: team
     })
 })
+
+/**
+ * @desc Update team (either members or assign new tasks)
+ * @route PUT /api/teams/:id
+ * @access Private (Only Field Admins can update the Teams)
+ */
+
+export const updateTeam = asyncHandleWrapper(async (req: AuthRequest, res: Response) => {
+    const { name, description } = req.body;
+
+    const team = await Team.findById(req.params.id).populate('field');
+
+    if (!team) {
+        res.status(404).json({
+            success: false,
+            error: 'Team not found'
+        });
+        return;
+    }
+
+    const field = await Field.findById(team.field);
+
+    if (!field) {
+        res.status(404).json({
+            success: false,
+            error: 'Field not found'
+        });
+        return;
+    }
+
+    // Check if user is the field admin
+    if (field.admin.toString() !== req.user?._id.toString()) {
+        res.status(403).json({
+            success: false,
+            error: 'Only the field admin can update teams'
+        });
+        return;
+    }
+
+    // Update fields
+    if (name) team.name = name;
+    if (description) team.description = description;
+
+    await team.save();
+
+    res.status(200).json({
+        success: true,
+        message: 'Team updated successfully',
+        data: team
+    });
+});
