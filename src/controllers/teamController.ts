@@ -220,8 +220,11 @@ export const updateTeam = asyncHandleWrapper(async (req: AuthRequest, res: Respo
         return;
     }
 
+    const isFieldAdmin = field.admin.toString() === req.user?._id.toString()
+    const isTeamLeader = team.teamLeader.toString() === req.user?._id.toString()
+
     // Check if user is the field admin
-    if (field.admin.toString() !== req.user?._id.toString()) {
+    if (!isFieldAdmin || !isTeamLeader) {
         res.status(403).json({
             success: false,
             error: 'Only the field admin can update teams'
