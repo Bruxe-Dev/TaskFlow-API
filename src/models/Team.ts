@@ -13,6 +13,11 @@ const teamSchema = new Schema<ITeam>({
         trim: true,
         maxlength: [500, 'Description cannot exceed 500 characters']
     },
+    teamLeader: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: [true, "Each Team must have a leader"]
+    },
     field: {
         type: Schema.Types.ObjectId,
         ref: 'Field',
