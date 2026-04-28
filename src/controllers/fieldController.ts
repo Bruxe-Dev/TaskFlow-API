@@ -94,3 +94,63 @@ export const updateField = asyncHandleWrapper(async (req: AuthRequest, res: Resp
         data: field
     })
 })
+
+/**
+ * @desc 
+ * @route
+ * @access
+ */
+
+export const deleteField = asyncHandleWrapper(async (req: AuthRequest, res: Response) => {
+    const field = await Field.findById(req.params.id);
+
+    if (!field) {
+        res.status(404).json({
+            success: false,
+            error: 'Field not found'
+        });
+        return;
+    }
+
+    const organization = await Organization.findById(field.organization);
+
+    if (!organization) {
+        res.status(404).json({
+            success: false,
+            error: 'Organization not found'
+        });
+        return;
+    }
+
+    if (organization.leader.toString() !== req.user?._id.toString()) {
+        res.status(403).json({
+            success: false,
+            error: 'Only the organization leader can delete fields'
+        });
+        return;
+    }
+
+    organization.fields = organization.fields.filter(
+        (fieldId) => fieldId.toString() !== field._id.toString()
+    );
+    organization.activeAdmins -= 1;
+    await organization.save();
+
+    // Update field admin user
+    await User.findByIdAndUpdate(field.admin, {
+        role: UserRole.MEMBER,
+        $unset: { field: 1 },
+        permissions: {
+            canCreateTeams: false,
+            canAssignTasks: false,
+            canReviewSubmissions: false
+        }
+    });
+
+    await field.deleteOne();
+
+    res.status(200).json({
+        success: true,
+        message: 'Field deleted successfully'
+    });
+});
