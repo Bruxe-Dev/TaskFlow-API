@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import User from '../models/User';
 import { IUser, UserRole } from '../types';
+import { Team } from '../models';
 
 export interface AuthRequest extends Request {
     user?: IUser;
@@ -170,4 +171,43 @@ export const isFieldAdmin = async (
     }
 
     next();
+};
+/**
+ * Check if user is team leader of a specific team
+ * @param teamIdParam - Parameter name containing team ID (default: 'id')
+ */
+
+export const isTeamLeader = (teamIdParam: string = 'id') => {
+    return async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+        if (!req.user) {
+            res.status(401).json({
+                success: false,
+                error: 'Not authenticated'
+            });
+            return;
+        }
+
+        const teamId = req.params[teamIdParam];
+
+        const team = await Team.findById(teamId);
+
+        if (!team) {
+            res.status(404).json({
+                success: false,
+                error: 'Team not found'
+            });
+            return;
+        }
+
+        // Check if user is the team leader
+        if (team.teamLeader.toString() !== req.user._id.toString()) {
+            res.status(403).json({
+                success: false,
+                error: 'Only the team leader can perform this action'
+            });
+            return;
+        }
+
+        next();
+    };
 };
