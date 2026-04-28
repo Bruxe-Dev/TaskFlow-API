@@ -13,9 +13,8 @@
         "forceConsistentCasingInFileNames": true,
         "resolveJsonModule": true,
         "moduleResolution": "node",
-        "ignoreDeprecations": 5.0,
+        "ignoreDeprecations": "6.0",
         "allowSyntheticDefaultImports": true,
-        // "moduleResolution": "bundler",
         "typeRoots": [
             "./node_modules/@types",
             "./src/types"
