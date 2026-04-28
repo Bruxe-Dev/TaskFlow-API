@@ -302,3 +302,152 @@ export const getFieldDashboard = asyncHandleWrapper(async (req: AuthRequest, res
         }
     });
 });
+
+/**
+ * @desc    Get field statistics
+ * @route   GET /api/fields/:id/stats
+ * @access  Private (field admin only)
+ */
+export const getFieldStats = asyncHandleWrapper(async (req: AuthRequest, res: Response) => {
+    const field = await Field.findById(req.params.id);
+
+    if (!field) {
+        res.status(404).json({
+            success: false,
+            error: 'Field not found'
+        });
+        return;
+    }
+
+    // Check if user is the field admin
+    if (field.admin.toString() !== req.user?._id.toString()) {
+        res.status(403).json({
+            success: false,
+            error: 'Only the field admin can view statistics'
+        });
+        return;
+    }
+
+    // Count members in this field
+    const totalMembers = await User.countDocuments({ field: field._id });
+
+    res.status(200).json({
+        success: true,
+        data: {
+            totalTeams: field.teams.length,
+            totalMembers,
+            sharedWith: field.sharedWithAdmins.length
+        }
+    });
+});
+
+/**
+ * @desc    Share field access with another admin
+ * @route   POST /api/fields/:id/share
+ * @access  Private (field admin only)
+ */
+export const shareFieldAccess = asyncHandleWrapper(async (req: AuthRequest, res: Response) => {
+    const { adminId } = req.body;
+
+    const field = await Field.findById(req.params.id);
+
+    if (!field) {
+        res.status(404).json({
+            success: false,
+            error: 'Field not found'
+        });
+        return;
+    }
+
+    // Check if user is the field admin
+    if (field.admin.toString() !== req.user?._id.toString()) {
+        res.status(403).json({
+            success: false,
+            error: 'Only the field admin can share access'
+        });
+        return;
+    }
+
+    // Verify the admin exists and belongs to same organization
+    const adminUser = await User.findById(adminId);
+
+    if (!adminUser) {
+        res.status(404).json({
+            success: false,
+            error: 'Admin user not found'
+        });
+        return;
+    }
+
+    if (adminUser.role !== UserRole.FIELD_ADMIN) {
+        res.status(400).json({
+            success: false,
+            error: 'User must be a field admin'
+        });
+        return;
+    }
+
+    if (adminUser.organization?.toString() !== field.organization.toString()) {
+        res.status(400).json({
+            success: false,
+            error: 'Admin must belong to the same organization'
+        });
+        return;
+    }
+
+    // Check if already shared
+    if (field.sharedWithAdmins.includes(adminUser._id)) {
+        res.status(400).json({
+            success: false,
+            error: 'Field is already shared with this admin'
+        });
+        return;
+    }
+
+    // Add admin to shared list
+    field.sharedWithAdmins.push(adminUser._id);
+    await field.save();
+
+    res.status(200).json({
+        success: true,
+        message: 'Field access shared successfully',
+        data: field
+    });
+});
+
+/**
+ * @desc    Remove shared field access
+ * @route   DELETE /api/fields/:id/share/:adminId
+ * @access  Private (field admin only)
+ */
+export const removeFieldAccess = asyncHandleWrapper(async (req: AuthRequest, res: Response) => {
+    const field = await Field.findById(req.params.id);
+
+    if (!field) {
+        res.status(404).json({
+            success: false,
+            error: 'Field not found'
+        });
+        return;
+    }
+
+    // Check if user is the field admin
+    if (field.admin.toString() !== req.user?._id.toString()) {
+        res.status(403).json({
+            success: false,
+            error: 'Only the field admin can remove access'
+        });
+        return;
+    }
+
+    field.sharedWithAdmins = field.sharedWithAdmins.filter(
+        (adminId) => adminId.toString() !== req.params.adminId
+    );
+    await field.save();
+
+    res.status(200).json({
+        success: true,
+        message: 'Field access removed successfully',
+        data: field
+    });
+});
