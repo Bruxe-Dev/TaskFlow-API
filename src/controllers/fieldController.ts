@@ -154,3 +154,40 @@ export const deleteField = asyncHandleWrapper(async (req: AuthRequest, res: Resp
         message: 'Field deleted successfully'
     });
 });
+
+/**
+ * @desc 
+ * @route
+ * @access
+ */
+
+export const getFieldTeams = asyncHandleWrapper(async (req: AuthRequest, res: Response) => {
+    const field = await Field.findById(req.params.id)
+        .populate({
+            path: 'teams',
+            populate: [
+                {
+                    path: 'members.user',
+                    select: 'username email profilePicture'
+                },
+                {
+                    path: 'workspace',
+                    select: 'name description'
+                }
+            ]
+        });
+
+    if (!field) {
+        res.status(404).json({
+            success: false,
+            message: "Field Not Found"
+        })
+        return;
+    }
+
+    res.status(200).json({
+        success: true,
+        count: field.teams.length,
+        data: field.teams
+    })
+})
