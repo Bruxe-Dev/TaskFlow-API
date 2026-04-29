@@ -16,6 +16,7 @@ import taskRoutes from './routes/taskRoute'
 import teamRoutes from './routes/teamRoutes'
 import organizationRoutes from './routes/organizationRoutes'
 import fieldRoutes from './routes/fieldRoutes'
+import workspaceRoutes from './routes/workspaceRoutes'
 
 const app: Application = express();
 const PORT: number = parseInt(process.env.PORT || '5000', 10);
@@ -37,6 +38,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/teams', teamRoutes);
 app.use('/api/organizations', organizationRoutes);
 app.use('/api/fields', fieldRoutes)
+app.use('/api/workspaces', workspaceRoutes)
 
 // Health check
 app.get('/', (req: Request, res: Response): void => {
