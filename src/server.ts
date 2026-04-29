@@ -13,6 +13,9 @@ import errorHandler from './middleware/errorHandler';
 import authRoutes from './routes/authRoutes'
 import projectRoutes from './routes/projectRoute'
 import taskRoutes from './routes/taskRoute'
+import teamRoutes from './routes/teamRoutes'
+import organizationRoutes from './routes/organizationRoutes'
+import fieldRoutes from './routes/fieldRoutes'
 
 const app: Application = express();
 const PORT: number = parseInt(process.env.PORT || '5000', 10);
@@ -31,6 +34,9 @@ if (process.env.NODE_ENV !== 'production') {
 app.use('/api/projects', projectRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/teams', teamRoutes);
+app.use('/api/organizations', organizationRoutes);
+app.use('/api/fields', fieldRoutes)
 
 // Health check
 app.get('/', (req: Request, res: Response): void => {

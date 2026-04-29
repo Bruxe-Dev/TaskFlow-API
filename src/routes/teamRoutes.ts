@@ -23,7 +23,7 @@ router.put('/:id', protect, isFieldAdmin, isTeamLeader, updateTeam);
 router.delete('/:id', protect, isFieldAdmin, deleteTeam);
 
 // Team leader
-router.put('/:id/leader', protect, isFieldAdmin, changeTeamLeader);
+router.put('/:id/leader', protect, isFieldAdmin, isTeamLeader, changeTeamLeader);
 // Team members
 router.post('/:id/members', protect, isFieldAdmin, addTeamMember);
 router.delete('/:id/members/:userId', protect, isFieldAdmin, removeTeamMember);
