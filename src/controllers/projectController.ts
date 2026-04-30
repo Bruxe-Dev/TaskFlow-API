@@ -5,9 +5,9 @@ import { Project, Workspace, Team, Field, Task, User, Notification } from '../mo
 import { UserRole, ProjectStatus, Priority, NotificationType } from '../types';
 
 /**
- * @desc 
- * @route
- * @access
+ * @desc Creating a new Project
+ * @route POST /api/projects/
+ * @access Private (Field Admins Only)
  */
 
 export const createProject = asyncHandlewrapper(async (req: AuthRequest, res: Response) => {
@@ -98,3 +98,62 @@ export const createProject = asyncHandlewrapper(async (req: AuthRequest, res: Re
         data: populatedProject
     });
 });
+
+
+/**
+ * @desc Get project Details
+ * @route GET /api/projects/:id
+ * @Private  authorized users only
+ */
+
+export const getProject = asyncHandlewrapper(async (req: AuthRequest, res: Response) => {
+    const project = await Project.findById(req.params.id)
+        .populate('assignedBy', 'username email')
+        .populate('team', 'name members')
+        .populate('workspace', 'name')
+        .populate({
+            path: 'tasks',
+            populate: {
+                path: 'assignedTo assignedBy',
+                select: 'username email'
+            }
+        })
+        .populate('submissions');
+
+    if (!project) {
+        res.status(404).json({
+            success: false,
+            message: "Project Not Found"
+        })
+        return
+    }
+
+    const team = await Team.findById(project.team)
+    if (!team) {
+        res.status(404).json({
+            success: false,
+            message: "Team Not Found"
+        })
+        return;
+    }
+
+    const isMember = team.members.some(
+        (member: any) => member.user.toString() === req.user?._id.toString()
+    );
+    const field = await Field.findById(team.field)
+    const isFieldAdmin = field?.admin.toString() === req.user?._id.toString()
+    const isOrgLeader = req.user?.role === UserRole.ORG_LEADER
+
+    if (!isFieldAdmin && !isMember && !isOrgLeader) {
+        res.status(403).json({
+            success: false,
+            message: "UNAUTHORIZED"
+        })
+        return;
+    }
+
+    res.status(200).json({
+        success: true,
+        data: project
+    })
+})
