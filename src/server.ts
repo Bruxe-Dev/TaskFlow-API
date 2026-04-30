@@ -11,7 +11,7 @@ import dbConnect from './config/db';
 import requestLogger from './middleware/reqLogger'
 import errorHandler from './middleware/errorHandler';
 import authRoutes from './routes/authRoutes'
-import projectRoutes from './routes/projectRoute'
+import projectRoutes from './routes/projectRoutes'
 import taskRoutes from './routes/taskRoute'
 import teamRoutes from './routes/teamRoutes'
 import organizationRoutes from './routes/organizationRoutes'
