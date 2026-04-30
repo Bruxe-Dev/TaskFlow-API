@@ -13,7 +13,6 @@ import asyncHandleWrapper from "../middleware/asyncHandlewrapp";
 export const createTeam = asyncHandleWrapper(async (req: AuthRequest, res: Response) => {
     const { name, description, fieldId, teamLeaderId, memberIds } = req.body;
 
-    // Verify field exists
     const field = await Field.findById(fieldId);
 
     if (!field) {
