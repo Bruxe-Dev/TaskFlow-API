@@ -1,10 +1,9 @@
-import { Response } from 'express';
+import { Response} from 'express';
 import { AuthRequest } from '../middleware/auth';
 import asyncHandlewrapper from '../middleware/asyncHandlewrapp';
 import { AIConversation, Workspace, Team, Project, Task } from '../models';
 import Anthropic from '@anthropic-ai/sdk';
 
-// Initialize Anthropic client
 const anthropic = new Anthropic({
     apiKey: process.env.ANTHROPIC_API_KEY
 });
@@ -20,7 +19,7 @@ export const chatWithAI = asyncHandlewrapper(async (req: AuthRequest, res: Respo
     if (!workspaceId || !message) {
         res.status(400).json({
             success: false,
-            error: 'Workspace ID and message are required'
+            error: 'Workspace and message are required'
         });
         return;
     }
