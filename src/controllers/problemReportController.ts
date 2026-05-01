@@ -85,7 +85,7 @@ export const createProblemReport = asyncHandlewrapper(async (req: AuthRequest, r
  * @route   GET /api/reports
  * @access  Private
  */
-export const getReports = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const getReports = asyncHandlewrapper(async (req: AuthRequest, res: Response) => {
     const { status, severity, category } = req.query;
 
     let query: any = {};
@@ -139,7 +139,7 @@ export const getReports = asyncHandler(async (req: AuthRequest, res: Response) =
  * @route   GET /api/reports/:id
  * @access  Private
  */
-export const getReport = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const getReport = asyncHandlewrapper(async (req: AuthRequest, res: Response) => {
     const report = await ProblemReport.findById(req.params.id)
         .populate('reportedBy', 'username email profilePicture')
         .populate('team', 'name')
@@ -164,7 +164,7 @@ export const getReport = asyncHandler(async (req: AuthRequest, res: Response) =>
  * @route   PUT /api/reports/:id
  * @access  Private (reporter + field admin)
  */
-export const updateReport = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const updateReport = asyncHandlewrapper(async (req: AuthRequest, res: Response) => {
     const { title, description, severity, category } = req.body;
 
     const report = await ProblemReport.findById(req.params.id);
@@ -211,7 +211,7 @@ export const updateReport = asyncHandler(async (req: AuthRequest, res: Response)
  * @route   DELETE /api/reports/:id
  * @access  Private (reporter + field admin)
  */
-export const deleteReport = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const deleteReport = asyncHandlewrapper(async (req: AuthRequest, res: Response) => {
     const report = await ProblemReport.findById(req.params.id);
 
     if (!report) {
@@ -249,7 +249,7 @@ export const deleteReport = asyncHandler(async (req: AuthRequest, res: Response)
  * @route   PATCH /api/reports/:id/assign
  * @access  Private (field admin only)
  */
-export const assignReport = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const assignReport = asyncHandlewrapper(async (req: AuthRequest, res: Response) => {
     const { adminId } = req.body;
 
     const report = await ProblemReport.findById(req.params.id);
@@ -289,7 +289,7 @@ export const assignReport = asyncHandler(async (req: AuthRequest, res: Response)
  * @route   PATCH /api/reports/:id/status
  * @access  Private (field admin only)
  */
-export const updateReportStatus = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const updateReportStatus = asyncHandlewrapper(async (req: AuthRequest, res: Response) => {
     const { status } = req.body;
 
     if (!status || !Object.values(ProblemStatus).includes(status)) {
@@ -327,7 +327,7 @@ export const updateReportStatus = asyncHandler(async (req: AuthRequest, res: Res
 
     // Notify reporter of status change
     await Notification.create({
-        recipient: report.reportedBy,
+        reciever: report.reportedBy,
         sender: req.user?._id,
         type: NotificationType.ANNOUNCEMENT,
         title: 'Report Status Updated',
