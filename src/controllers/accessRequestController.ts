@@ -1,15 +1,15 @@
 import { Response } from 'express';
 import { AuthRequest } from '../middleware/auth';
-import asyncHandler from '../middleware/asyncHandler';
+import asyncHandlewrapper from '../middleware/asyncHandlewrapp';
 import { AccessRequest, Field, User, Notification } from '../models';
-import { UserRole, AccessRequestStatus, NotificationType, Priority } from '../types';
+import { UserRole, AccessStatus, NotificationType, Priority } from '../types';
 
 /**
  * @desc    Create access request
  * @route   POST /api/access-requests
  * @access  Private (any member)
  */
-export const createAccessRequest = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const createAccessRequest = asyncHandlewrapper(async (req: AuthRequest, res: Response) => {
     const { targetFieldId, targetWorkspaceId, reason } = req.body;
 
     if (!targetFieldId || !reason) {
