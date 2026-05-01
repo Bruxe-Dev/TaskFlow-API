@@ -59,13 +59,13 @@ export const createProblemReport = asyncHandlewrapper(async (req: AuthRequest, r
     const field = await Field.findById(team.field);
     if (field) {
         await Notification.create({
-            recipient: field.admin,
+            reciever: field.admin,
             sender: req.user?._id,
             type: NotificationType.ANNOUNCEMENT,
             title: 'New Problem Report',
             message: `${req.user?.username} reported a ${severity || 'medium'} severity issue: ${title}`,
             link: `/reports/${report._id}`,
-            priority: severity === ProblemSeverity.CRITICAL ? Priority.URGENT : Priority.HIGH
+            priority: severity === ProblemSeverity.HIGH ? Priority.URGENT : Priority.HIGH
         });
     }
 
@@ -333,7 +333,7 @@ export const updateReportStatus = asyncHandlewrapper(async (req: AuthRequest, re
         title: 'Report Status Updated',
         message: `Your report "${report.title}" status changed to ${status}`,
         link: `/reports/${report._id}`,
-        priority: Priority.NORMAL
+        priority: Priority.LOW
     });
 
     res.status(200).json({
@@ -348,7 +348,7 @@ export const updateReportStatus = asyncHandlewrapper(async (req: AuthRequest, re
  * @route   POST /api/reports/:id/resolve
  * @access  Private (field admin only)
  */
-export const resolveReport = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const resolveReport = asyncHandlewrapper(async (req: AuthRequest, res: Response) => {
     const { resolution } = req.body;
 
     if (!resolution) {
@@ -389,13 +389,13 @@ export const resolveReport = asyncHandler(async (req: AuthRequest, res: Response
 
     // Notify reporter
     await Notification.create({
-        recipient: report.reportedBy,
+        reciever: report.reportedBy,
         sender: req.user?._id,
         type: NotificationType.ANNOUNCEMENT,
         title: 'Report Resolved',
         message: `Your report "${report.title}" has been resolved`,
         link: `/reports/${report._id}`,
-        priority: Priority.NORMAL
+        priority: Priority.LOW
     });
 
     res.status(200).json({
@@ -410,7 +410,7 @@ export const resolveReport = asyncHandler(async (req: AuthRequest, res: Response
  * @route   GET /api/reports/my-reports
  * @access  Private
  */
-export const getMyReports = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const getMyReports = asyncHandlewrapper(async (req: AuthRequest, res: Response) => {
     const reports = await ProblemReport.find({ reportedBy: req.user?._id })
         .populate('team', 'name')
         .populate('assignedTo', 'username email')
@@ -428,7 +428,7 @@ export const getMyReports = asyncHandler(async (req: AuthRequest, res: Response)
  * @route   GET /api/reports/assigned-to-me
  * @access  Private (field admin only)
  */
-export const getAssignedReports = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const getAssignedReports = asyncHandlewrapper(async (req: AuthRequest, res: Response) => {
     const reports = await ProblemReport.find({ assignedTo: req.user?._id })
         .populate('reportedBy', 'username email')
         .populate('team', 'name')
