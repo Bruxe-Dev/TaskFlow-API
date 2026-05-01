@@ -42,7 +42,7 @@ export const createAccessRequest = asyncHandlewrapper(async (req: AuthRequest, r
     const existingRequest = await AccessRequest.findOne({
         requester: req.user?._id,
         targetField: targetFieldId,
-        status: AccessRequestStatus.PENDING
+        status: AccessStatus.PENDING
     });
 
     if (existingRequest) {
@@ -59,18 +59,18 @@ export const createAccessRequest = asyncHandlewrapper(async (req: AuthRequest, r
         targetField: targetFieldId,
         targetWorkspace: targetWorkspaceId,
         reason,
-        status: AccessRequestStatus.PENDING
+        status: AccessStatus.PENDING
     });
 
     // Notify field admin
     await Notification.create({
-        recipient: targetField.admin,
+        reciever: targetField.admin,
         sender: req.user?._id,
         type: NotificationType.ACCESS_GRANTED,
         title: 'New Access Request',
         message: `${req.user?.username} requested access to your field`,
         link: `/access-requests/${accessRequest._id}`,
-        priority: Priority.NORMAL
+        priority: Priority.MEDIUM
     });
 
     const populatedRequest = await AccessRequest.findById(accessRequest._id)
@@ -89,7 +89,7 @@ export const createAccessRequest = asyncHandlewrapper(async (req: AuthRequest, r
  * @route   GET /api/access-requests
  * @access  Private
  */
-export const getAccessRequests = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const getAccessRequests = asyncHandlewrapper(async (req: AuthRequest, res: Response) => {
     const { status } = req.query;
 
     let query: any = {};
@@ -129,7 +129,7 @@ export const getAccessRequests = asyncHandler(async (req: AuthRequest, res: Resp
  * @route   GET /api/access-requests/:id
  * @access  Private
  */
-export const getAccessRequest = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const getAccessRequest = asyncHandlewrapper(async (req: AuthRequest, res: Response) => {
     const request = await AccessRequest.findById(req.params.id)
         .populate('requester', 'username email profilePicture')
         .populate('targetField', 'name description')
@@ -154,7 +154,7 @@ export const getAccessRequest = asyncHandler(async (req: AuthRequest, res: Respo
  * @route   PUT /api/access-requests/:id
  * @access  Private (requester only if pending)
  */
-export const updateAccessRequest = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const updateAccessRequest = asyncHandlewrapper(async (req: AuthRequest, res: Response) => {
     const { reason } = req.body;
 
     const request = await AccessRequest.findById(req.params.id);
@@ -176,7 +176,7 @@ export const updateAccessRequest = asyncHandler(async (req: AuthRequest, res: Re
         return;
     }
 
-    if (request.status !== AccessRequestStatus.PENDING) {
+    if (request.status !== AccessStatus.PENDING) {
         res.status(400).json({
             success: false,
             error: 'Only pending requests can be updated'
@@ -200,7 +200,7 @@ export const updateAccessRequest = asyncHandler(async (req: AuthRequest, res: Re
  * @route   DELETE /api/access-requests/:id
  * @access  Private (requester only)
  */
-export const cancelAccessRequest = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const cancelAccessRequest = asyncHandlewrapper(async (req: AuthRequest, res: Response) => {
     const request = await AccessRequest.findById(req.params.id);
 
     if (!request) {
@@ -233,7 +233,7 @@ export const cancelAccessRequest = asyncHandler(async (req: AuthRequest, res: Re
  * @route   POST /api/access-requests/:id/approve
  * @access  Private (field admin only)
  */
-export const approveAccessRequest = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const approveAccessRequest = asyncHandlewrapper(async (req: AuthRequest, res: Response) => {
     const { approvalNotes, expiresInDays } = req.body;
 
     const request = await AccessRequest.findById(req.params.id);
@@ -265,7 +265,7 @@ export const approveAccessRequest = asyncHandler(async (req: AuthRequest, res: R
         return;
     }
 
-    request.status = AccessRequestStatus.APPROVED;
+    request.status = AccessStatus.APPROVED;
     request.approvedBy = req.user?._id;
     request.approvalNotes = approvalNotes;
     request.processedAt = new Date();
