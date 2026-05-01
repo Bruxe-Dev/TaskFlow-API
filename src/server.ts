@@ -22,6 +22,7 @@ import notificationRoutes from './routes/notificationRoutes'
 import problemReportRoutes from './routes/problemReportRoutes'
 import accessRequestRoutes from './routes/accessRequestRoutes'
 import aiRoutes from './routes/aiRoutes'
+import dashboardRoutes from './routes/dashboardRoutes'
 
 const app: Application = express();
 const PORT: number = parseInt(process.env.PORT || '5000', 10);
@@ -49,6 +50,7 @@ app.use('/api/notifications', notificationRoutes)
 app.use('/api/reports', problemReportRoutes)
 app.use('/api/access-requests', accessRequestRoutes)
 app.use('/api/ai', aiRoutes)
+app.use('/api/dashboard', dashboardRoutes)
 
 // Health check
 app.get('/', (req: Request, res: Response): void => {
