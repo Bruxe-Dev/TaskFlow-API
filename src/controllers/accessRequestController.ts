@@ -284,7 +284,7 @@ export const approveAccessRequest = asyncHandlewrapper(async (req: AuthRequest, 
 
     // Notify requester
     await Notification.create({
-        recipient: request.requester,
+        reciever: request.requester,
         sender: req.user?._id,
         type: NotificationType.ACCESS_GRANTED,
         title: 'Access Request Approved',
@@ -305,7 +305,7 @@ export const approveAccessRequest = asyncHandlewrapper(async (req: AuthRequest, 
  * @route   POST /api/access-requests/:id/deny
  * @access  Private (field admin only)
  */
-export const denyAccessRequest = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const denyAccessRequest = asyncHandlewrapper(async (req: AuthRequest, res: Response) => {
     const { approvalNotes } = req.body;
 
     const request = await AccessRequest.findById(req.params.id);
@@ -337,7 +337,7 @@ export const denyAccessRequest = asyncHandler(async (req: AuthRequest, res: Resp
         return;
     }
 
-    request.status = AccessRequestStatus.DENIED;
+    request.status = AccessStatus.DENIED;
     request.approvedBy = req.user?._id;
     request.approvalNotes = approvalNotes;
     request.processedAt = new Date();
@@ -346,13 +346,13 @@ export const denyAccessRequest = asyncHandler(async (req: AuthRequest, res: Resp
 
     // Notify requester
     await Notification.create({
-        recipient: request.requester,
+        reciever: request.requester,
         sender: req.user?._id,
         type: NotificationType.ACCESS_DENIED,
         title: 'Access Request Denied',
         message: `Your access request to ${field.name} has been denied`,
         link: `/access-requests/${request._id}`,
-        priority: Priority.NORMAL
+        priority: Priority.LOW
     });
 
     res.status(200).json({
@@ -367,7 +367,7 @@ export const denyAccessRequest = asyncHandler(async (req: AuthRequest, res: Resp
  * @route   GET /api/access-requests/my-requests
  * @access  Private
  */
-export const getMyRequests = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const getMyRequests = asyncHandlewrapper(async (req: AuthRequest, res: Response) => {
     const requests = await AccessRequest.find({ requester: req.user?._id })
         .populate('targetField', 'name')
         .populate('approvedBy', 'username email')
@@ -385,7 +385,7 @@ export const getMyRequests = asyncHandler(async (req: AuthRequest, res: Response
  * @route   GET /api/access-requests/pending
  * @access  Private (field admin only)
  */
-export const getPendingRequests = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const getPendingRequests = asyncHandlewrapper(async (req: AuthRequest, res: Response) => {
     const field = await Field.findOne({ admin: req.user?._id });
 
     if (!field && req.user?.role !== UserRole.ORG_LEADER) {
@@ -398,7 +398,7 @@ export const getPendingRequests = asyncHandler(async (req: AuthRequest, res: Res
 
     const requests = await AccessRequest.find({
         targetField: field?._id,
-        status: AccessRequestStatus.PENDING
+        status: AccessStatus.PENDING
     })
         .populate('requester', 'username email profilePicture')
         .sort({ createdAt: -1 });
