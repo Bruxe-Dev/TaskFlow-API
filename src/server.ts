@@ -20,6 +20,7 @@ import workspaceRoutes from './routes/workspaceRoutes'
 import submissionRoutes from './routes/submissionRoutes'
 import notificationRoutes from './routes/notificationRoutes'
 import problemReportRoutes from './routes/problemReportRoutes'
+import accessRequestRoutes from './routes/accessRequestRoutes'
 
 const app: Application = express();
 const PORT: number = parseInt(process.env.PORT || '5000', 10);
@@ -45,6 +46,7 @@ app.use('/api/workspaces', workspaceRoutes)
 app.use('/api/submissions', submissionRoutes)
 app.use('/api/notifications', notificationRoutes)
 app.use('/api/reports', problemReportRoutes)
+app.use('/api/access-requests', accessRequestRoutes)
 
 // Health check
 app.get('/', (req: Request, res: Response): void => {
