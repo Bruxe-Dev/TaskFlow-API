@@ -116,4 +116,64 @@ export const chatWithAI = asyncHandlewrapper(async (req: AuthRequest, res: Respo
         }
     }
 
+    const conversationHistory = conversation.messages.map((msg: any) => ({
+        role: msg.role,
+        content: msg.content
+    }));
+
+    conversation.messages.push({
+        role: 'user',
+        content: message,
+        timestamp: new Date()
+    });
+
+    try {
+        // Call Claude API
+        const response = await anthropic.messages.create({
+            model: 'claude-sonnet-4-20250514',
+            max_tokens: 1024,
+            system: `${contextInfo}You are a helpful AI assistant for a project management team. Help them with:
+- Task breakdown and planning
+- Problem-solving
+- Code assistance
+- Best practices
+- Time management
+- Team collaboration tips
+
+Be concise, practical, and actionable. Focus on helping the team succeed.`,
+            messages: [
+                ...conversationHistory,
+                { role: 'user', content: message }
+            ]
+        });
+
+        // Extract AI response
+        const aiMessage = response.content[0].type === 'text' ? response.content[0].text : 'Sorry, I could not generate a response.';
+
+        // Add AI response to conversation
+        conversation.messages.push({
+            role: 'assistant',
+            content: aiMessage,
+            timestamp: new Date()
+        });
+
+        conversation.lastMessageAt = new Date();
+        await conversation.save();
+
+        res.status(200).json({
+            success: true,
+            data: {
+                conversationId: conversation._id,
+                message: aiMessage,
+                timestamp: new Date()
+            }
+        });
+
+    } catch (error: any) {
+        console.error('AI Error:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to get AI response. Please try again.'
+        });
+    }
 })
