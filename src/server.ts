@@ -19,6 +19,7 @@ import fieldRoutes from './routes/fieldRoutes'
 import workspaceRoutes from './routes/workspaceRoutes'
 import submissionRoutes from './routes/submissionRoutes'
 import notificationRoutes from './routes/notificationRoutes'
+import problemReportRoutes from './routes/problemReportRoutes'
 
 const app: Application = express();
 const PORT: number = parseInt(process.env.PORT || '5000', 10);
@@ -43,6 +44,7 @@ app.use('/api/fields', fieldRoutes)
 app.use('/api/workspaces', workspaceRoutes)
 app.use('/api/submissions', submissionRoutes)
 app.use('/api/notifications', notificationRoutes)
+app.use('/api/reports', problemReportRoutes)
 
 // Health check
 app.get('/', (req: Request, res: Response): void => {
