@@ -1,4 +1,4 @@
-import { Response} from 'express';
+import { NextFunction, Response } from 'express';
 import { AuthRequest } from '../middleware/auth';
 import asyncHandlewrapper from '../middleware/asyncHandlewrapp';
 import { AIConversation, Workspace, Team, Project, Task } from '../models';
@@ -310,7 +310,7 @@ export const deleteConversation = asyncHandlewrapper(async (req: AuthRequest, re
  * @route   POST /api/ai/conversations/:id/continue
  * @access  Private
  */
-export const continueConversation = asyncHandlewrapper(async (req: AuthRequest, res: Response) => {
+export const continueConversation = asyncHandlewrapper(async (req: AuthRequest, res: Response, next: NextFunction) => {
     const { message } = req.body;
 
     if (!message) {
@@ -337,7 +337,7 @@ export const continueConversation = asyncHandlewrapper(async (req: AuthRequest, 
     req.body.projectId = conversation.context?.project?.toString();
     req.body.taskId = conversation.context?.task?.toString();
 
-    return chatWithAI(req, res);
+    return chatWithAI(req, res, next);
 });
 
 /**
