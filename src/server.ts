@@ -1,5 +1,7 @@
 import dotenv from 'dotenv';
 dotenv.config();
+import swaggerUi from 'swagger-ui-express';
+import swaggerSpec from './config/swagger';
 
 console.log('Environment Check:');
 console.log('PORT:', process.env.PORT);
@@ -32,6 +34,7 @@ dbConnect();
 
 // Middleware
 app.use(express.json());
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
 
 if (process.env.NODE_ENV !== 'production') {
     app.use(requestLogger);
