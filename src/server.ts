@@ -4,6 +4,7 @@ import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './config/swagger';
 import cors from 'cors'
 import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 
 console.log('Environment Check:');
 console.log('PORT:', process.env.PORT);
@@ -38,6 +39,13 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // Limit each IP to 100 requests per windowMs
+    message: 'Too many requests from this IP, please try again later.'
+});
+app.use('/api/', limiter)
 const PORT: number = parseInt(process.env.PORT || '5000', 10);
 
 // Database
