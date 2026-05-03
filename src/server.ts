@@ -3,6 +3,7 @@ dotenv.config();
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './config/swagger';
 import cors from 'cors'
+import helmet from 'helmet';
 
 console.log('Environment Check:');
 console.log('PORT:', process.env.PORT);
@@ -29,6 +30,7 @@ import dashboardRoutes from './routes/dashboardRoutes'
 
 const app: Application = express();
 
+app.use(helmet());
 const corsOptions = {
     origin: process.env.CLIENT_URL || 'http://localhost:3000',
     credentials: true,
