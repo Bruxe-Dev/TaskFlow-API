@@ -2,6 +2,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './config/swagger';
+import cors from 'cors'
 
 console.log('Environment Check:');
 console.log('PORT:', process.env.PORT);
@@ -27,6 +28,14 @@ import aiRoutes from './routes/aiRoutes'
 import dashboardRoutes from './routes/dashboardRoutes'
 
 const app: Application = express();
+
+const corsOptions = {
+    origin: process.env.CLIENT_URL || 'http://localhost:3000',
+    credentials: true,
+    optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
 const PORT: number = parseInt(process.env.PORT || '5000', 10);
 
 // Database
