@@ -54,7 +54,7 @@ if (process.env.NODE_ENV !== 'production') {
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI as string)
     .then(() => console.log('MongoDB connected'))
-    .catch((err) => console.error('❌ MongoDB connection error:', err));
+    .catch((err) => console.error('MongoDB connection error:', err));
 
 // Use routes
 app.use('/api/auth', authRoutes);
