@@ -138,10 +138,10 @@ export default function Tasks() {
 
     return (
         <div className="flex flex-col h-full overflow-hidden">
-            <TopBar title="Task Automate" starred />
+            <TopBar title="Task Automate starred" />
 
             {/* View tabs */}
-            <div className="flex items-center gap-1 px-6 py-2 border-b border-border bg-card/30">
+            <div className="flex items-center gap-1 px-6 py-2 border-b border-border bg-card /30">
                 {[
                     { key: 'kanban', label: 'Kanban' },
                     { key: 'table', label: 'Table' },
@@ -171,7 +171,7 @@ export default function Tasks() {
                 {view === 'kanban' && <KanbanView groups={groups} />}
                 {view === 'table' && <TableView groups={groups} />}
             </div>
-        </div>
+        </div >
     );
 }
 
