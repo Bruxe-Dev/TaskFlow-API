@@ -4,6 +4,8 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
+import { existsSync } from 'fs';
+import path from 'path';
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './config/swagger';
 import logger from './middleware/reqLogger';
@@ -23,6 +25,7 @@ import aiRoutes from './routes/aiRoutes';
 import dashboardRoutes from './routes/dashboardRoutes';
 
 const app = express();
+const frontendDir = path.resolve(__dirname, '..', 'frontend', 'dist');
 
 // Security middleware
 app.use(helmet());
@@ -74,6 +77,12 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, { explorer: t
 app.get('/api-docs.json', (req, res) => {
     res.json(swaggerSpec);
 });
+if (existsSync(frontendDir)) {
+    app.use('/app', express.static(frontendDir));
+    app.get(/^\/app(\/.*)?$/, (req, res) => {
+        res.sendFile(path.join(frontendDir, 'index.html'));
+    });
+}
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -90,7 +99,8 @@ app.get('/', (req, res) => {
         message: 'TaskFlow Enterprise API',
         version: '1.0.0',
         status: 'Running',
-        docs: '/api-docs'
+        docs: '/api-docs',
+        frontend: '/app'
     });
 });
 
