@@ -17,6 +17,7 @@ router.post('/chat', protect, chatWithAI);
 
 // Conversations
 router.get('/conversations/:workspaceId', protect, getWorkspaceConversations);
+router.get('/conversation/:id', protect, getConversation);
 router.get('/conversations/:id', protect, getConversation);
 router.delete('/conversations/:id', protect, deleteConversation);
 router.post('/conversations/:id/continue', protect, continueConversation);

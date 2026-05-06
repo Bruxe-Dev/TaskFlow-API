@@ -4,6 +4,23 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
+import swaggerUi from 'swagger-ui-express';
+import swaggerSpec from './config/swagger';
+import logger from './middleware/reqLogger';
+import errorHandler from './middleware/errorHandler';
+import authRoutes from './routes/authRoutes';
+import organizationRoutes from './routes/organizationRoutes';
+import fieldRoutes from './routes/fieldRoutes';
+import teamRoutes from './routes/teamRoutes';
+import workspaceRoutes from './routes/workspaceRoutes';
+import projectRoutes from './routes/projectRoutes';
+import taskRoutes from './routes/taskRoutes';
+import submissionRoutes from './routes/submissionRoutes';
+import notificationRoutes from './routes/notificationRoutes';
+import problemReportRoutes from './routes/problemReportRoutes';
+import accessRequestRoutes from './routes/accessRequestRoutes';
+import aiRoutes from './routes/aiRoutes';
+import dashboardRoutes from './routes/dashboardRoutes';
 
 const app = express();
 
@@ -29,10 +46,6 @@ app.use('/api/', limiter);
 // Body parser middleware
 app.use(express.json());
 
-// Import middleware
-const logger = require('./middleware/logger');
-const errorHandler = require('./middleware/errorHandler');
-
 // Logger middleware (only in development)
 if (process.env.NODE_ENV !== 'production') {
     app.use(logger);
@@ -42,21 +55,6 @@ if (process.env.NODE_ENV !== 'production') {
 mongoose.connect(process.env.MONGO_URI as string)
     .then(() => console.log('✅ MongoDB connected'))
     .catch((err) => console.error('❌ MongoDB connection error:', err));
-
-// Import routes
-const authRoutes = require('./routes/authRoutes');
-const organizationRoutes = require('./routes/organizationRoutes');
-const fieldRoutes = require('./routes/fieldRoutes');
-const teamRoutes = require('./routes/teamRoutes');
-const workspaceRoutes = require('./routes/workspaceRoutes');
-const projectRoutes = require('./routes/projectRoutes');
-const taskRoutes = require('./routes/taskRoutes');
-const submissionRoutes = require('./routes/submissionRoutes');
-const notificationRoutes = require('./routes/notificationRoutes');
-const problemReportRoutes = require('./routes/problemReportRoutes');
-const accessRequestRoutes = require('./routes/accessRequestRoutes');
-const aiRoutes = require('./routes/aiRoutes');
-const dashboardRoutes = require('./routes/dashboardRoutes');
 
 // Use routes
 app.use('/api/auth', authRoutes);
@@ -72,6 +70,10 @@ app.use('/api/reports', problemReportRoutes);
 app.use('/api/access-requests', accessRequestRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, { explorer: true }));
+app.get('/api-docs.json', (req, res) => {
+    res.json(swaggerSpec);
+});
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -87,7 +89,8 @@ app.get('/', (req, res) => {
     res.json({
         message: 'TaskFlow Enterprise API',
         version: '1.0.0',
-        status: 'Running'
+        status: 'Running',
+        docs: '/api-docs'
     });
 });
 
