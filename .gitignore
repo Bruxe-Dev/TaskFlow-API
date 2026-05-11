@@ -1,4 +1,4 @@
 node_modules/
 dist/
-.env
 .DB_Store
+config.bat
